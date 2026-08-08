@@ -1,0 +1,637 @@
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500&display=swap');
+
+.rr-app{
+  --paper:#E4DFD2; --card:#F7F4EA; --ink:#26221E; --ink-faint:#8B8577;
+  --rule:#C9C2AC; --wood:#6B4A34; --stamp-red:#8B3A2A; --stamp-green:#3F5B4E;
+  --stamp-indigo:#454F6B; --stamp-gray:#8C8577;
+  font-family:'Source Serif 4',serif; color:var(--ink); background:var(--paper);
+  border-radius:12px; overflow:hidden; border:1px solid var(--rule);
+}
+.rr-app *{box-sizing:border-box;}
+.rr-mono{font-family:'IBM Plex Mono',monospace;}
+.rr-display{font-family:'Fraunces',serif;}
+</style>
+
+<div class="rr-app" id="rrApp">
+  <div id="rrLoading" style="padding:64px 24px; text-align:center; font-family:'IBM Plex Mono',monospace; font-size:13px; color:#8B8577; letter-spacing:.04em;">
+    opening the drawer…
+  </div>
+
+  <div id="rrShell" style="display:none;">
+
+    <div style="display:flex; border-bottom:1px solid var(--rule); background:var(--wood); color:#EFE9DA;">
+      <div style="padding:18px 22px; flex:1; min-width:0;">
+        <div class="rr-display" style="font-size:20px; font-weight:600; letter-spacing:.01em;">The Reading Room</div>
+        <div class="rr-mono" style="font-size:11px; opacity:.8; margin-top:2px; letter-spacing:.06em;" id="rrSubtitle">A CATALOG FOR THE DISSERTATION</div>
+      </div>
+      <div style="display:flex; align-items:center; gap:0;">
+        <button class="rr-mode-btn rr-mono" data-mode="reading" style="border:none; background:transparent; color:#EFE9DA; padding:0 20px; height:100%; font-size:11px; letter-spacing:.08em; cursor:pointer; border-bottom:2px solid #EFE9DA; opacity:1;">READING ROOM</button>
+        <button class="rr-mode-btn rr-mono" data-mode="writing" style="border:none; background:transparent; color:#EFE9DA; padding:0 20px; height:100%; font-size:11px; letter-spacing:.08em; cursor:pointer; border-bottom:2px solid transparent; opacity:.65;">WRITING DESK</button>
+      </div>
+    </div>
+
+    <div style="display:flex; min-height:420px;">
+
+      <aside style="width:168px; flex-shrink:0; background:#DCD6C6; border-right:1px solid var(--rule); padding:16px 0;">
+        <div class="rr-mono" style="font-size:10px; letter-spacing:.08em; color:var(--ink-faint); padding:0 16px 10px;">DRAWERS</div>
+        <nav id="rrTabs"></nav>
+        <div style="margin:18px 16px 0; padding-top:14px; border-top:1px solid var(--rule);">
+          <div class="rr-mono" style="font-size:10px; letter-spacing:.08em; color:var(--ink-faint); padding-bottom:8px;">TAGS</div>
+          <div id="rrTagCloud"></div>
+        </div>
+        <div style="margin:18px 16px 0; padding-top:14px; border-top:1px solid var(--rule);">
+          <div class="rr-mono" style="font-size:10px; letter-spacing:.06em; color:var(--ink-faint); line-height:1.7;">
+            Argument map — cards filed per pillar. A thin drawer means a thin argument.
+          </div>
+        </div>
+        <div style="margin:18px 16px 0; padding-top:14px; border-top:1px solid var(--rule);">
+          <div class="rr-mono" style="font-size:10px; letter-spacing:.06em; color:var(--ink-faint); line-height:1.7;">
+            New sources arrive via the Literature Log in Drive. Ask Claude to "sync the reading room" to pull in the latest run.
+          </div>
+        </div>
+      </aside>
+
+      <main style="flex:1; min-width:0; padding:18px 22px;">
+
+        <div id="rrReadingHead" style="display:flex; gap:10px; align-items:center; margin-bottom:16px; flex-wrap:wrap;">
+          <div style="position:relative; flex:1; min-width:180px;">
+            <span class="rr-mono" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); font-size:13px; color:var(--ink-faint);">⌕</span>
+            <input id="rrSearch" placeholder="search title, author, note, #tag…" class="rr-mono" style="width:100%; padding:8px 10px 8px 28px; font-size:12px; background:var(--card); border:1px solid var(--rule); color:var(--ink); outline:none;" />
+          </div>
+          <select id="rrSort" class="rr-mono" style="padding:8px 8px; font-size:11px; background:var(--card); border:1px solid var(--rule); color:var(--ink);">
+            <option value="dateAdded-desc">newest filed</option>
+            <option value="dateAdded-asc">oldest filed</option>
+            <option value="year-desc">year, newest</option>
+            <option value="year-asc">year, oldest</option>
+            <option value="title-asc">title, a–z</option>
+          </select>
+          <button id="rrAddBtn" class="rr-mono" style="padding:8px 14px; font-size:11px; letter-spacing:.04em; background:var(--ink); color:var(--card); border:1px solid var(--ink); cursor:pointer;">+ FILE A CARD</button>
+        </div>
+
+        <div id="rrGrid" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:14px;"></div>
+        <div id="rrEmpty" style="display:none; padding:40px 10px; text-align:center; color:var(--ink-faint);">
+          <div class="rr-display" style="font-size:16px; margin-bottom:6px;">This drawer is empty.</div>
+          <div class="rr-mono" style="font-size:11px;">File a source to begin building the argument.</div>
+        </div>
+
+        <div id="rrWritingView" style="display:none;">
+
+          <div style="background:var(--card); border:1px solid var(--rule); margin-bottom:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 14px; border-bottom:1px solid var(--rule);">
+              <div class="rr-mono" style="font-size:10px; letter-spacing:.06em; color:var(--ink-faint);">WRITING DESK — DRAFTS SAVE HERE AUTOMATICALLY</div>
+              <div class="rr-mono" style="font-size:11px; display:flex; gap:14px;">
+                <span id="rrDeskWords">0 words</span>
+                <span id="rrDeskSessionWords" style="color:var(--stamp-green);">+0 this session</span>
+              </div>
+            </div>
+            <textarea id="rrDraft" placeholder="Start writing here — this autosaves locally as you go…" style="width:100%; min-height:220px; padding:14px; border:none; outline:none; background:transparent; font-family:'Source Serif 4',serif; font-size:15px; line-height:1.6; color:var(--ink); resize:vertical;"></textarea>
+            <div id="rrChecks" style="padding:8px 14px 12px; border-top:1px solid var(--rule); display:none;"></div>
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 14px; border-top:1px solid var(--rule); flex-wrap:wrap; gap:8px;">
+              <div class="rr-mono" style="font-size:10px; color:var(--ink-faint); max-width:360px; line-height:1.5;">
+                Checks are local pattern-flags, not real grammar AI. For a real edit or argument-vetting pass, paste this draft to Claude in chat.
+              </div>
+              <div style="display:flex; gap:8px; align-items:center;">
+                <input id="rrDeskNote" type="text" placeholder="note for this session (optional)" style="padding:7px 8px; font-size:12px; background:var(--paper); border:1px solid var(--rule); color:var(--ink); font-family:'Source Serif 4',serif; width:200px;" />
+                <button id="rrCopyDraft" type="button" class="rr-mono" style="padding:7px 12px; font-size:11px; background:transparent; border:1px solid var(--rule); color:var(--ink); cursor:pointer;">COPY DRAFT</button>
+                <button id="rrLogSession" type="button" class="rr-mono" style="padding:7px 12px; font-size:11px; background:var(--ink); color:var(--card); border:1px solid var(--ink); cursor:pointer;">LOG SESSION</button>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:18px;">
+            <div style="background:var(--card); border:1px solid var(--rule); padding:12px 14px;">
+              <div class="rr-mono" style="font-size:10px; color:var(--ink-faint); letter-spacing:.06em;">TOTAL WORDS LOGGED</div>
+              <div class="rr-display" id="rrTotalWords" style="font-size:22px; margin-top:4px;">0</div>
+            </div>
+            <div style="background:var(--card); border:1px solid var(--rule); padding:12px 14px;">
+              <div class="rr-mono" style="font-size:10px; color:var(--ink-faint); letter-spacing:.06em;">SESSIONS LOGGED</div>
+              <div class="rr-display" id="rrTotalSessions" style="font-size:22px; margin-top:4px;">0</div>
+            </div>
+            <div style="background:var(--card); border:1px solid var(--rule); padding:12px 14px;">
+              <div class="rr-mono" style="font-size:10px; color:var(--ink-faint); letter-spacing:.06em;">LAST SESSION</div>
+              <div class="rr-display" id="rrLastSession" style="font-size:22px; margin-top:4px;">—</div>
+            </div>
+          </div>
+
+          <div id="rrSessError" style="display:none; color:var(--stamp-red); font-size:11px; margin:-8px 0 14px;" class="rr-mono"></div>
+
+          <div id="rrSessList"></div>
+          <div id="rrSessEmpty" style="display:none; padding:30px 10px; text-align:center; color:var(--ink-faint);">
+            <div class="rr-display" style="font-size:16px; margin-bottom:6px;">No sessions logged yet.</div>
+            <div class="rr-mono" style="font-size:11px;">Every entry becomes evidence you did the work.</div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <div id="rrModalOverlay" style="display:none; position:fixed; inset:0; background:rgba(38,34,30,.55); z-index:9999; align-items:center; justify-content:center; padding:20px;">
+    <form id="rrForm" style="background:var(--card); width:100%; max-width:420px; border:1px solid var(--rule); padding:20px 22px;">
+      <div class="rr-mono" style="font-size:10px; letter-spacing:.08em; color:var(--ink-faint); margin-bottom:10px;">NEW CATALOG CARD</div>
+      <input required id="fTitle" placeholder="title" style="width:100%; margin-bottom:8px; padding:8px; font-size:14px; background:#fff; border:1px solid var(--rule); font-family:'Fraunces',serif;" />
+      <input required id="fAuthor" placeholder="author" style="width:100%; margin-bottom:8px; padding:8px; font-size:13px; background:#fff; border:1px solid var(--rule); font-family:'Source Serif 4',serif;" />
+      <div style="display:flex; gap:8px; margin-bottom:8px;">
+        <input id="fYear" placeholder="year" style="width:90px; padding:8px; font-size:13px; background:#fff; border:1px solid var(--rule);" />
+        <select id="fCategory" style="flex:1; padding:8px; font-size:13px; background:#fff; border:1px solid var(--rule);"></select>
+      </div>
+      <input id="fUrl" placeholder="link (optional — enables the in-app reader)" style="width:100%; margin-bottom:8px; padding:8px; font-size:12px; background:#fff; border:1px solid var(--rule);" />
+      <input id="fTags" placeholder="tags, comma separated" style="width:100%; margin-bottom:8px; padding:8px; font-size:12px; background:#fff; border:1px solid var(--rule);" />
+      <textarea id="fNote" placeholder="one line — why this matters to the argument" rows="2" style="width:100%; margin-bottom:14px; padding:8px; font-size:13px; background:#fff; border:1px solid var(--rule); font-family:'Source Serif 4',serif; resize:vertical;"></textarea>
+      <div style="display:flex; justify-content:flex-end; gap:8px;">
+        <button type="button" id="rrCancel" class="rr-mono" style="padding:8px 14px; font-size:11px; background:transparent; border:1px solid var(--rule); color:var(--ink); cursor:pointer;">CANCEL</button>
+        <button type="submit" class="rr-mono" style="padding:8px 14px; font-size:11px; background:var(--ink); color:var(--card); border:1px solid var(--ink); cursor:pointer;">FILE CARD →</button>
+      </div>
+    </form>
+  </div>
+
+  <div id="rrReaderOverlay" style="display:none; position:fixed; inset:0; background:rgba(38,34,30,.75); z-index:9998; flex-direction:column; padding:16px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-shrink:0;">
+      <div class="rr-mono" id="rrReaderTitle" style="color:#EFE9DA; font-size:12px; letter-spacing:.04em; max-width:80%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"></div>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <a id="rrReaderOpenTab" href="#" target="_blank" rel="noopener" class="rr-mono" style="color:#EFE9DA; font-size:11px; text-decoration:underline;">open in new tab ↗</a>
+        <button id="rrReaderClose" class="rr-mono" style="cursor:pointer; background:transparent; border:1px solid #EFE9DA; color:#EFE9DA; padding:5px 10px; font-size:11px;">CLOSE ✕</button>
+      </div>
+    </div>
+    <div style="flex:1; background:#fff; border-radius:2px; overflow:hidden;">
+      <iframe id="rrReaderFrame" style="width:100%; height:100%; border:none;"></iframe>
+    </div>
+  </div>
+
+  <div id="rrSessReviewOverlay" style="display:none; position:fixed; inset:0; background:rgba(38,34,30,.55); z-index:9997; align-items:center; justify-content:center; padding:20px;">
+    <div style="background:var(--card); width:100%; max-width:380px; border:1px solid var(--rule); padding:20px 22px;">
+      <div class="rr-mono" style="font-size:10px; letter-spacing:.08em; color:var(--ink-faint); margin-bottom:12px;">SESSION REVIEW</div>
+      <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+        <div id="rrSessReviewDate" class="rr-display" style="font-size:16px;"></div>
+        <div id="rrSessReviewWords" class="rr-mono" style="font-size:13px; color:var(--stamp-green);"></div>
+      </div>
+      <div id="rrSessReviewNote" style="font-size:13px; line-height:1.6; color:var(--ink); margin-bottom:16px;"></div>
+      <div style="display:flex; justify-content:flex-end;">
+        <button id="rrSessReviewClose" type="button" class="rr-mono" style="padding:7px 14px; font-size:11px; background:var(--ink); color:var(--card); border:1px solid var(--ink); cursor:pointer;">CLOSE</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var CATEGORIES = [
+    {key:'atmospheres', label:'Atmospheres', prefix:'MNZ', accent:'#6B4A34'},
+    {key:'activism', label:'Design activism', prefix:'MRK', accent:'#8B3A2A'},
+    {key:'roii', label:'ROII / impact', prefix:'ROII', accent:'#3F5B4E'},
+    {key:'memory', label:'Contested memory', prefix:'MEM', accent:'#454F6B'},
+    {key:'unsorted', label:'Unsorted', prefix:'UNS', accent:'#8C8577'}
+  ];
+  var STATUS_ORDER = ['to-read','reading','read','cited'];
+  var STATUS_META = {
+    'to-read':{label:'TO READ', color:'#8C8577'},
+    'reading':{label:'READING', color:'#8B3A2A'},
+    'read':{label:'READ', color:'#26221E'},
+    'cited':{label:'CITED', color:'#3F5B4E'}
+  };
+
+  var entries = [];
+  var sessions = [];
+  var activeCategory = 'all';
+  var activeTag = null;
+  var mode = 'reading';
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function catByKey(k){ for(var i=0;i<CATEGORIES.length;i++){ if(CATEGORIES[i].key===k) return CATEGORIES[i]; } return CATEGORIES[CATEGORIES.length-1]; }
+
+  function seedEntries(){
+    var now = Date.now();
+    return [
+      {id:'s1', title:'Design, When Everybody Designs', author:'Ezio Manzini', year:'2015', category:'atmospheres', url:'', note:"Source of 'atmospheres' — designed conditions that afford social encounter.", status:'cited', dateAdded: now-300000, tags:['atmospheres','social innovation','encounter design']},
+      {id:'s2', title:'The Disruptive Aesthetics of Design Activism', author:'Thomas Markussen', year:'2013', category:'activism', url:'', note:'Frames design activism as operating between art and politics — test against ROII cultural permission.', status:'read', dateAdded: now-200000, tags:['design activism','aesthetics','politics']},
+      {id:'s3', title:'ROII — Return on Intangible Investment (working framework)', author:'D. Shen', year:'', category:'roii', url:'', note:'Own framework — social resilience, cultural permission, ecological credit.', status:'reading', dateAdded: now-100000, tags:['framework','impact measurement','own-work']}
+    ];
+  }
+
+  var DRIVE_IMPORTS = [
+    {id:'imp-kang2026', title:'Research on Experiential Translation and Design Strategies of Intangible Cultural Heritage Products', author:'Mingyu Kang', year:'2026', category:'atmospheres', url:'https://drive.google.com/file/d/1xCFFVffij6kJVB1bx__N_GZdSqX4tKWo/view', note:'Immersive communication as designed cultural experience — multisensory, interactive, scenario-based strategies for transmitting intangible heritage.', status:'to-read', tags:['immersive communication','intangible heritage','multisensory design']},
+    {id:'imp-li2024', title:'Forming National Identity with Televised Cultural Rituals: a Critical Discourse Analysis of China\u2019s Ancient Rhyme and New Voice\u2014Qingming Program', author:'Duruo Li, Marwan H. Sallam, Zhiwu He', year:'2024', category:'memory', url:'https://drive.google.com/file/d/13P0Suo9TfimhTTto99DZytSpaAytimMN/view', note:'Televised ritual as national-identity mechanism — directly relevant to contested memory framing.', status:'to-read', tags:['national identity','cultural ritual','discourse analysis']},
+    {id:'imp-ndp2014', title:'Why Don\u2019t Singaporean Youths Feel Connected to National Identity Through Participating in NDP?', author:'David Chong Yong Ming', year:'2014', category:'memory', url:'https://drive.google.com/file/d/1u4ADQooEOzNibgkshy1OaF9W7OKo0VC1/view', note:'Undergraduate research paper on NDP and youth disconnection from national identity — connects to own NDP project history.', status:'to-read', tags:['NDP','youth','memory studies']},
+    {id:'imp-markussen2017', title:"Disentangling 'the social' in social design's engagement with the public realm", author:'Thomas Markussen', year:'2017', category:'activism', url:'https://doi.org/10.1080/15710882.2017.1355001', note:'Follow-up to the 2013 disruptive-aesthetics paper. Proposes defining criteria to separate social design from social innovation and entrepreneurship — check the scale-of-effects criterion against ROII cultural permission.', status:'to-read', tags:['design activism','social design','framework']},
+    {id:'imp-menghe2025', title:'Intergenerational Transmission of Collective Memory in Public Spaces: A Case Study of Menghe, a Historic and Cultural Town', author:'Sustainability journal (authors unresolved)', year:'2025', category:'memory', url:'https://doi.org/10.3390/su17198596', note:"Field study tracing how collective memory shifts between generations as public space redevelops — memory 'nodes' migrate from old sites to new ones. Strong comparator for NDP/Qingming material.", status:'to-read', tags:['collective memory','public space','intergenerational']},
+    {id:'imp-yugoslav2022', title:'Sustainability of Cultural Memory: Youth Perspectives on Yugoslav World War Two Memorials', author:'Sustainability journal (authors unresolved)', year:'2022', category:'memory', url:'https://www.mdpi.com/2071-1050/14/9/5586', note:'Surveys students on how they read WWII memorial typologies across former Yugoslav states. Contested memorial heritage as something youth must be actively educated into.', status:'to-read', tags:['contested memory','youth','memorials']},
+    {id:'imp-digitalmemory2026', title:'Empirical Analysis of Cultural Memory Awakening in Youth Groups through Digital Recreation of Auspicious Pattern Cultural Products', author:'(authors unresolved)', year:'2026', category:'atmospheres', url:'https://www.researchgate.net/publication/406083661', note:"Quantitative study on whether digitally regenerated traditional motifs reactivate youth cultural memory, framed as turning symbols into 'participatory fields' — close to atmospheres. Very recent; read critically.", status:'to-read', tags:['digital regeneration','cultural memory','youth']}
+  ];
+
+  function mergeDriveImports(){
+    var existingIds = {};
+    entries.forEach(function(e){ existingIds[e.id] = true; });
+    var added = false;
+    var base = Date.now();
+    DRIVE_IMPORTS.forEach(function(imp, i){
+      if(!existingIds[imp.id]){
+        var copy = {};
+        for(var k in imp){ copy[k] = imp[k]; }
+        copy.dateAdded = base + i;
+        entries.push(copy);
+        added = true;
+      }
+    });
+    return added;
+  }
+
+  function esc(s){ var d=document.createElement('div'); d.textContent = s==null?'':s; return d.innerHTML; }
+
+  function saveEntries(){ try{ window.storage.set('rr-catalog-entries', JSON.stringify(entries)); }catch(e){ console.error('save entries failed', e); } }
+  function saveSessions(){ try{ window.storage.set('rr-writing-sessions', JSON.stringify(sessions)); }catch(e){ console.error('save sessions failed', e); } }
+
+  function renderTabs(){
+    var counts = {};
+    CATEGORIES.forEach(function(c){ counts[c.key]=0; });
+    entries.forEach(function(e){ if(counts[e.category]!==undefined) counts[e.category]++; });
+    var total = entries.length;
+    var html = '';
+    html += tabRow('all','All cards', total, '#26221E', activeCategory==='all');
+    CATEGORIES.forEach(function(c){ html += tabRow(c.key, c.label, counts[c.key], c.accent, activeCategory===c.key); });
+    document.getElementById('rrTabs').innerHTML = html;
+    Array.prototype.forEach.call(document.querySelectorAll('.rr-tab'), function(btn){
+      btn.addEventListener('click', function(){ activeCategory = btn.getAttribute('data-key'); render(); });
+    });
+  }
+  function tabRow(key,label,count,accent,active){
+    return '<button class="rr-tab rr-mono" data-key="'+key+'" style="display:flex; justify-content:space-between; align-items:center; width:100%; text-align:left; padding:7px 16px; border:none; background:'+(active?'var(--card)':'transparent')+'; border-left:3px solid '+(active?accent:'transparent')+'; color:var(--ink); font-size:12px; cursor:pointer;">'+
+      '<span>'+esc(label)+'</span><span style="color:var(--ink-faint); font-size:10px;">'+count+'</span></button>';
+  }
+
+  function allTags(){
+    var counts = {};
+    entries.forEach(function(e){ (e.tags||[]).forEach(function(t){ counts[t] = (counts[t]||0)+1; }); });
+    return Object.keys(counts).sort(function(a,b){ return counts[b]-counts[a] || a.localeCompare(b); }).map(function(t){ return {tag:t, count:counts[t]}; });
+  }
+
+  function renderTagCloud(){
+    var wrap = document.getElementById('rrTagCloud');
+    if(!wrap) return;
+    var tags = allTags();
+    if(tags.length===0){ wrap.innerHTML = '<div class="rr-mono" style="font-size:10px; color:var(--ink-faint);">no tags filed yet</div>'; return; }
+    wrap.innerHTML = tags.map(function(t){
+      var on = activeTag===t.tag;
+      return '<button class="rr-tagchip rr-mono" data-tag="'+esc(t.tag)+'" style="display:inline-flex; align-items:center; gap:4px; margin:0 6px 6px 0; padding:3px 8px; font-size:10px; letter-spacing:.02em; cursor:pointer; border:1px solid '+(on?'var(--ink)':'var(--rule)')+'; background:'+(on?'var(--ink)':'transparent')+'; color:'+(on?'var(--card)':'var(--ink)')+'; border-radius:0;">#'+esc(t.tag)+'<span style="opacity:.6;">'+t.count+'</span></button>';
+    }).join('');
+    Array.prototype.forEach.call(wrap.querySelectorAll('.rr-tagchip'), function(btn){
+      btn.addEventListener('click', function(){
+        var t = btn.getAttribute('data-tag');
+        activeTag = (activeTag===t) ? null : t;
+        render();
+      });
+    });
+  }
+
+  function callNumber(entry){
+    var cat = catByKey(entry.category);
+    var siblings = entries.filter(function(e){ return e.category===entry.category; }).sort(function(a,b){ return a.dateAdded-b.dateAdded; });
+    var idx = siblings.findIndex(function(e){ return e.id===entry.id; }) + 1;
+    return cat.prefix + ' ' + String(idx).padStart(3,'0');
+  }
+
+  function filteredEntries(){
+    var q = document.getElementById('rrSearch').value.trim().toLowerCase();
+    var sort = document.getElementById('rrSort').value;
+    var list = entries.filter(function(e){
+      if(activeCategory!=='all' && e.category!==activeCategory) return false;
+      if(activeTag && (!e.tags || e.tags.indexOf(activeTag)===-1)) return false;
+      if(!q) return true;
+      var hay = e.title+' '+e.author+' '+e.note+' '+((e.tags||[]).join(' '));
+      return hay.toLowerCase().indexOf(q) !== -1;
+    });
+    list.sort(function(a,b){
+      if(sort==='dateAdded-desc') return b.dateAdded-a.dateAdded;
+      if(sort==='dateAdded-asc') return a.dateAdded-b.dateAdded;
+      if(sort==='year-desc') return (b.year||'0')-(a.year||'0');
+      if(sort==='year-asc') return (a.year||'0')-(b.year||'0');
+      if(sort==='title-asc') return a.title.localeCompare(b.title);
+      return 0;
+    });
+    return list;
+  }
+
+  function renderCards(){
+    var list = filteredEntries();
+    var grid = document.getElementById('rrGrid');
+    var empty = document.getElementById('rrEmpty');
+    if(list.length===0){ grid.innerHTML=''; empty.style.display='block'; return; }
+    empty.style.display='none';
+    grid.innerHTML = list.map(cardHtml).join('');
+    Array.prototype.forEach.call(grid.querySelectorAll('.rr-stamp'), function(el){
+      el.addEventListener('click', function(){ cycleStatus(el.getAttribute('data-id')); });
+    });
+    Array.prototype.forEach.call(grid.querySelectorAll('.rr-cardtag'), function(el){
+      el.addEventListener('click', function(){ activeTag = el.getAttribute('data-tag'); render(); });
+    });
+    Array.prototype.forEach.call(grid.querySelectorAll('.rr-read'), function(el){
+      el.addEventListener('click', function(){ if(!el.disabled) openReader(el.getAttribute('data-id')); });
+    });
+    Array.prototype.forEach.call(grid.querySelectorAll('.rr-cite'), function(el){
+      el.addEventListener('click', function(){ citeEntry(el.getAttribute('data-id')); });
+    });
+    Array.prototype.forEach.call(grid.querySelectorAll('.rr-delete'), function(el){
+      el.addEventListener('click', function(){ deleteEntry(el.getAttribute('data-id')); });
+    });
+  }
+
+  function deleteEntry(id){
+    var e = entries.find(function(x){ return x.id===id; });
+    if(!e) return;
+    if(!window.confirm('Remove "'+e.title+'" from the catalog? This can\'t be undone.')) return;
+    entries = entries.filter(function(x){ return x.id!==id; });
+    saveEntries();
+    if(activeTag && !entries.some(function(x){ return (x.tags||[]).indexOf(activeTag)!==-1; })) activeTag = null;
+    render();
+  }
+
+  function tagChips(e){
+    var tags = e.tags || [];
+    if(tags.length===0) return '';
+    return '<div style="display:flex; flex-wrap:wrap; gap:4px;">' + tags.map(function(t){
+      return '<span class="rr-cardtag rr-mono" data-tag="'+esc(t)+'" style="cursor:pointer; font-size:9px; padding:2px 6px; border:1px solid var(--rule); color:var(--ink-faint);">#'+esc(t)+'</span>';
+    }).join('') + '</div>';
+  }
+
+  function cardHtml(e){
+    var cat = catByKey(e.category);
+    var sm = STATUS_META[e.status] || STATUS_META['to-read'];
+    var canRead = !!e.url;
+    var readBtn = '<button class="rr-read rr-mono" data-id="'+e.id+'" title="'+(canRead?'read in interface':'no reader available — no link filed')+'" '+(canRead?'':'disabled')+' style="cursor:'+(canRead?'pointer':'default')+'; background:transparent; border:none; color:'+(canRead?'var(--stamp-indigo)':'var(--rule)')+'; font-size:10px; padding:0; letter-spacing:.02em;" class="rr-mono">'+(canRead?'read ▸':'no reader')+'</button>';
+    var citeBtn = '<button class="rr-cite rr-mono" data-id="'+e.id+'" title="copy citation" style="cursor:pointer; background:transparent; border:none; color:var(--ink-faint); font-size:10px; padding:0; letter-spacing:.02em;">cite ⧉</button>';
+    var delBtn = '<button class="rr-delete rr-mono" data-id="'+e.id+'" title="remove this card" style="cursor:pointer; background:transparent; border:none; color:var(--ink-faint); font-size:12px; padding:0; line-height:1;">✕</button>';
+    return '<div style="background:var(--card); border:1px solid var(--rule); border-left:3px solid '+cat.accent+'; padding:12px 14px; display:flex; flex-direction:column; gap:6px; min-height:170px; position:relative;">'+
+      delBtn.replace('style="', 'style="position:absolute; top:10px; right:10px; ') +
+      '<div class="rr-mono" style="font-size:10px; color:var(--ink-faint); display:flex; justify-content:space-between; padding-right:16px;"><span>'+esc(callNumber(e))+'</span><span>'+esc(e.year||'')+'</span></div>'+
+      '<div class="rr-display" style="font-size:14px; font-weight:600; line-height:1.3; padding-right:14px;">'+esc(e.title)+'</div>'+
+      '<div style="font-size:12px; color:var(--ink-faint); font-style:italic;">'+esc(e.author)+'</div>'+
+      (e.note ? '<div style="font-size:12px; line-height:1.5; flex:1;">'+esc(e.note)+'</div>' : '<div style="flex:1;"></div>') +
+      tagChips(e) +
+      '<div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:2px;">'+
+        '<div style="display:flex; gap:10px;">'+readBtn+citeBtn+'</div>'+
+        '<button class="rr-stamp rr-mono" data-id="'+e.id+'" title="cycle status" style="cursor:pointer; background:transparent; border:1.5px solid '+sm.color+'; color:'+sm.color+'; padding:3px 8px; font-size:9px; letter-spacing:.06em; transform:rotate(-2deg); transition:'+(reduceMotion?'none':'transform .15s')+';">'+sm.label+'</button>'+
+      '</div>'+
+    '</div>';
+  }
+
+  function cycleStatus(id){
+    var e = entries.find(function(x){ return x.id===id; });
+    if(!e) return;
+    var i = STATUS_ORDER.indexOf(e.status);
+    e.status = STATUS_ORDER[(i+1) % STATUS_ORDER.length];
+    saveEntries();
+    renderCards();
+    if(!reduceMotion){
+      var btn = document.querySelector('.rr-stamp[data-id="'+id+'"]');
+      if(btn){ btn.style.transform='rotate(-2deg) scale(1.25)'; setTimeout(function(){ btn.style.transform='rotate(-2deg) scale(1)'; },150); }
+    }
+    renderTabs();
+  }
+
+  function renderWriting(){
+    var totalWords = sessions.reduce(function(s,x){ return s+(parseInt(x.words)||0); },0);
+    document.getElementById('rrTotalWords').textContent = totalWords.toLocaleString();
+    document.getElementById('rrTotalSessions').textContent = sessions.length;
+    var last = sessions.slice().sort(function(a,b){ return b.date.localeCompare(a.date); })[0];
+    document.getElementById('rrLastSession').textContent = last ? last.date : '—';
+    var list = sessions.slice().sort(function(a,b){ return b.date.localeCompare(a.date); });
+    var wrap = document.getElementById('rrSessList');
+    var empty = document.getElementById('rrSessEmpty');
+    if(list.length===0){ wrap.innerHTML=''; empty.style.display='block'; return; }
+    empty.style.display='none';
+    wrap.innerHTML = list.map(function(s){
+      return '<div class="rr-sessrow" data-id="'+s.id+'" style="display:flex; gap:14px; padding:10px 0; border-bottom:1px solid var(--rule); align-items:baseline; cursor:pointer;">'+
+        '<div class="rr-mono" style="font-size:11px; color:var(--ink-faint); width:90px; flex-shrink:0;">'+esc(s.date)+'</div>'+
+        '<div class="rr-display" style="font-size:14px; width:80px; flex-shrink:0;">'+(parseInt(s.words)||0).toLocaleString()+' w</div>'+
+        '<div style="font-size:13px; color:var(--ink); flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">'+esc(s.note||'')+'</div>'+
+        '<div class="rr-mono" style="font-size:10px; color:var(--stamp-indigo); flex-shrink:0;">review ▸</div>'+
+      '</div>';
+    }).join('');
+    Array.prototype.forEach.call(wrap.querySelectorAll('.rr-sessrow'), function(el){
+      el.addEventListener('click', function(){ openSessionReview(el.getAttribute('data-id')); });
+    });
+  }
+
+  function openSessionReview(id){
+    var s = sessions.find(function(x){ return x.id===id; });
+    if(!s) return;
+    document.getElementById('rrSessReviewDate').textContent = s.date;
+    document.getElementById('rrSessReviewWords').textContent = (parseInt(s.words)||0).toLocaleString() + ' words';
+    document.getElementById('rrSessReviewNote').textContent = s.note || '(no note added for this session)';
+    document.getElementById('rrSessReviewOverlay').style.display = 'flex';
+  }
+  function closeSessionReview(){ document.getElementById('rrSessReviewOverlay').style.display = 'none'; }
+
+  function render(){
+    renderTabs();
+    renderTagCloud();
+    if(mode==='reading'){
+      document.getElementById('rrReadingHead').style.display='flex';
+      document.getElementById('rrGrid').style.display='grid';
+      document.getElementById('rrWritingView').style.display='none';
+      renderCards();
+    } else {
+      document.getElementById('rrReadingHead').style.display='none';
+      document.getElementById('rrGrid').style.display='none';
+      document.getElementById('rrEmpty').style.display='none';
+      document.getElementById('rrWritingView').style.display='block';
+      renderWriting();
+    }
+  }
+
+  function openModal(){
+    var sel = document.getElementById('fCategory');
+    sel.innerHTML = CATEGORIES.map(function(c){ return '<option value="'+c.key+'">'+esc(c.label)+'</option>'; }).join('');
+    if(activeCategory!=='all') sel.value = activeCategory;
+    document.getElementById('rrForm').reset();
+    sel.value = activeCategory!=='all' ? activeCategory : 'unsorted';
+    document.getElementById('rrModalOverlay').style.display='flex';
+    document.getElementById('fTitle').focus();
+  }
+  function closeModal(){ document.getElementById('rrModalOverlay').style.display='none'; }
+
+  function driveEmbedUrl(url){
+    var m = url.match(/drive\.google\.com\/file\/d\/([^\/]+)/);
+    if(m) return 'https://drive.google.com/file/d/'+m[1]+'/preview';
+    return url;
+  }
+
+  function openReader(id){
+    var e = entries.find(function(x){ return x.id===id; });
+    if(!e || !e.url) return;
+    document.getElementById('rrReaderTitle').textContent = callNumber(e) + '  ·  ' + e.title;
+    document.getElementById('rrReaderFrame').src = driveEmbedUrl(e.url);
+    document.getElementById('rrReaderOpenTab').href = e.url;
+    document.getElementById('rrReaderOverlay').style.display = 'flex';
+    if(e.status==='to-read'){ e.status='reading'; saveEntries(); renderCards(); }
+  }
+  function closeReader(){
+    document.getElementById('rrReaderOverlay').style.display = 'none';
+    document.getElementById('rrReaderFrame').src = '';
+  }
+
+  function citeEntry(id){
+    var e = entries.find(function(x){ return x.id===id; });
+    if(!e) return;
+    var y = e.year ? ' ('+e.year+')' : '';
+    var text = e.author + y + '. ' + e.title + '.' + (e.url ? ' ' + e.url : '');
+    var done = function(){
+      var btn = document.querySelector('.rr-cite[data-id="'+id+'"]');
+      if(btn){ var orig = btn.textContent; btn.textContent = 'copied ✓'; setTimeout(function(){ btn.textContent = orig; }, 1200); }
+    };
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done).catch(function(){ window.prompt('Copy citation:', text); });
+    } else {
+      window.prompt('Copy citation:', text);
+    }
+  }
+
+  function init(){
+    document.getElementById('rrSubtitle').textContent = 'A CATALOG FOR THE DISSERTATION';
+    Array.prototype.forEach.call(document.querySelectorAll('.rr-mode-btn'), function(btn){
+      btn.addEventListener('click', function(){
+        mode = btn.getAttribute('data-mode');
+        Array.prototype.forEach.call(document.querySelectorAll('.rr-mode-btn'), function(b){
+          b.style.opacity = b===btn ? '1' : '.65';
+          b.style.borderBottomColor = b===btn ? '#EFE9DA' : 'transparent';
+        });
+        render();
+      });
+    });
+    document.getElementById('rrSearch').addEventListener('input', renderCards);
+    document.getElementById('rrSort').addEventListener('change', renderCards);
+    document.getElementById('rrAddBtn').addEventListener('click', openModal);
+    document.getElementById('rrCancel').addEventListener('click', closeModal);
+    document.getElementById('rrModalOverlay').addEventListener('click', function(ev){ if(ev.target.id==='rrModalOverlay') closeModal(); });
+    document.getElementById('rrReaderClose').addEventListener('click', closeReader);
+    document.getElementById('rrReaderOverlay').addEventListener('click', function(ev){ if(ev.target.id==='rrReaderOverlay') closeReader(); });
+    document.getElementById('rrSessReviewClose').addEventListener('click', closeSessionReview);
+    document.getElementById('rrSessReviewOverlay').addEventListener('click', function(ev){ if(ev.target.id==='rrSessReviewOverlay') closeSessionReview(); });
+
+    document.getElementById('rrForm').addEventListener('submit', function(ev){
+      ev.preventDefault();
+      var entry = {
+        id: 'e'+Date.now(),
+        title: document.getElementById('fTitle').value.trim(),
+        author: document.getElementById('fAuthor').value.trim(),
+        year: document.getElementById('fYear').value.trim(),
+        category: document.getElementById('fCategory').value,
+        url: document.getElementById('fUrl').value.trim(),
+        note: document.getElementById('fNote').value.trim(),
+        tags: document.getElementById('fTags').value.split(',').map(function(t){ return t.trim(); }).filter(Boolean),
+        status: 'to-read',
+        dateAdded: Date.now()
+      };
+      entries.push(entry);
+      saveEntries();
+      closeModal();
+      render();
+    });
+
+    var draftEl = document.getElementById('rrDraft');
+    var sessionBaseline = 0;
+    var checkTimer = null;
+
+    function wordCount(text){
+      var t = text.trim();
+      if(!t) return 0;
+      return t.split(/\s+/).length;
+    }
+
+    function runChecks(text){
+      var flags = [];
+      var sentences = text.split(/(?<=[.!?])\s+/).filter(Boolean);
+      sentences.forEach(function(s){
+        var wc = wordCount(s);
+        if(wc > 40) flags.push('A sentence runs ' + wc + ' words — consider splitting it.');
+      });
+      var passivePattern = /\b(is|are|was|were|be|been|being)\s+\w+ed\b/gi;
+      var passiveMatches = text.match(passivePattern);
+      if(passiveMatches && passiveMatches.length >= 3) flags.push(passiveMatches.length + ' possible passive-voice constructions — worth a scan.');
+      var words = text.toLowerCase().match(/\b[a-z']+\b/g) || [];
+      for(var i=1;i<words.length;i++){ if(words[i]===words[i-1] && words[i].length>2){ flags.push('Repeated word: "'+words[i]+' '+words[i]+'".'); break; } }
+      var confusions = [[/\btheir\s+is\b/gi,'"their is" — likely "there is"'], [/\bits\s+a\b/gi,'"its a" — likely "it\'s a"'], [/\baffect\s+of\b/gi,'"affect of" — likely "effect of"']];
+      confusions.forEach(function(c){ if(c[0].test(text)) flags.push(c[1]+'.'); });
+      return flags.slice(0,5);
+    }
+
+    function renderChecks(text){
+      var box = document.getElementById('rrChecks');
+      var flags = text.trim() ? runChecks(text) : [];
+      if(flags.length===0){ box.style.display='none'; box.innerHTML=''; return; }
+      box.style.display='block';
+      box.innerHTML = '<div class="rr-mono" style="font-size:10px; color:var(--ink-faint); letter-spacing:.06em; margin-bottom:6px;">FLAGGED</div>' +
+        flags.map(function(f){ return '<div style="font-size:12px; color:var(--stamp-red); margin-bottom:3px;">· '+esc(f)+'</div>'; }).join('');
+    }
+
+    function updateDeskStats(){
+      var text = draftEl.value;
+      var total = wordCount(text);
+      document.getElementById('rrDeskWords').textContent = total.toLocaleString() + ' words';
+      var sessionWords = Math.max(0, total - sessionBaseline);
+      document.getElementById('rrDeskSessionWords').textContent = '+' + sessionWords.toLocaleString() + ' this session';
+    }
+
+    draftEl.addEventListener('input', function(){
+      updateDeskStats();
+      try{ window.storage.set('rr-draft-text', draftEl.value); }catch(e){ console.error('draft save failed', e); }
+      clearTimeout(checkTimer);
+      checkTimer = setTimeout(function(){ renderChecks(draftEl.value); }, 500);
+    });
+
+    document.getElementById('rrCopyDraft').addEventListener('click', function(){
+      var text = draftEl.value;
+      var btn = document.getElementById('rrCopyDraft');
+      var done = function(){ var orig = btn.textContent; btn.textContent='COPIED ✓'; setTimeout(function(){ btn.textContent = orig; }, 1200); };
+      if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).then(done).catch(function(){ window.prompt('Copy draft:', text); }); }
+      else { window.prompt('Copy draft:', text); }
+    });
+
+    document.getElementById('rrLogSession').addEventListener('click', function(){
+      var errEl = document.getElementById('rrSessError');
+      var total = wordCount(draftEl.value);
+      var sessionWords = Math.max(0, total - sessionBaseline);
+      if(sessionWords === 0){ errEl.textContent = 'Write something new before logging a session.'; errEl.style.display='block'; return; }
+      errEl.style.display='none';
+      var date = new Date().toISOString().slice(0,10);
+      var noteEl = document.getElementById('rrDeskNote');
+      sessions.push({id:'w'+Date.now(), date:date, words:sessionWords, note:noteEl.value.trim()});
+      noteEl.value = '';
+      saveSessions();
+      sessionBaseline = total;
+      updateDeskStats();
+      renderWriting();
+    });
+
+    Promise.all([
+      window.storage.get('rr-catalog-entries').catch(function(){ return null; }),
+      window.storage.get('rr-writing-sessions').catch(function(){ return null; }),
+      window.storage.get('rr-draft-text').catch(function(){ return null; })
+    ]).then(function(results){
+      try{
+        entries = results[0] && results[0].value ? JSON.parse(results[0].value) : seedEntries();
+      }catch(e){ entries = seedEntries(); }
+      try{
+        sessions = results[1] && results[1].value ? JSON.parse(results[1].value) : [];
+      }catch(e){ sessions = []; }
+      draftEl.value = (results[2] && results[2].value) ? results[2].value : '';
+      sessionBaseline = wordCount(draftEl.value);
+      updateDeskStats();
+      var importedNew = mergeDriveImports();
+      if(!results[0] || importedNew) saveEntries();
+      document.getElementById('rrLoading').style.display='none';
+      document.getElementById('rrShell').style.display='block';
+      render();
+    }).catch(function(err){
+      console.error('storage load failed', err);
+      entries = seedEntries();
+      sessions = [];
+      document.getElementById('rrLoading').style.display='none';
+      document.getElementById('rrShell').style.display='block';
+      render();
+    });
+  }
+
+  init();
+})();
+</script>
