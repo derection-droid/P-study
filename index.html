@@ -1,125 +1,135 @@
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
 
 .rr-app{
-  --paper:#E4DFD2; --card:#F7F4EA; --ink:#26221E; --ink-faint:#8B8577;
-  --rule:#C9C2AC; --wood:#6B4A34; --stamp-red:#8B3A2A; --stamp-green:#3F5B4E;
-  --stamp-indigo:#454F6B; --stamp-gray:#8C8577;
-  font-family:'Source Serif 4',serif; color:var(--ink); background:var(--paper);
-  border-radius:12px; overflow:hidden; border:1px solid var(--rule);
+  --bg:#070707; --panel:#111111; --panel2:#161616; --line:#2A2A2A; --line-dim:#1C1C1C;
+  --ink:#ECECEC; --ink-dim:#8A8A8A; --ink-faint:#4E4E4E; --glyph:#FFFFFF;
+  font-family:'JetBrains Mono',monospace; font-weight:300; color:var(--ink); background:var(--bg);
+  border-radius:10px; overflow:hidden; border:1px solid var(--line); letter-spacing:.01em;
 }
-.rr-app *{box-sizing:border-box;}
-.rr-mono{font-family:'IBM Plex Mono',monospace;}
-.rr-display{font-family:'Fraunces',serif;}
+.rr-app *{box-sizing:border-box; font-family:'JetBrains Mono',monospace;}
+.rr-app input, .rr-app select, .rr-app textarea, .rr-app button{ font-family:'JetBrains Mono',monospace; }
+.rr-app ::placeholder{ color:var(--ink-faint); }
 </style>
 
 <div class="rr-app" id="rrApp">
-  <div id="rrLoading" style="padding:64px 24px; text-align:center; font-family:'IBM Plex Mono',monospace; font-size:13px; color:#8B8577; letter-spacing:.04em;">
-    opening the drawer…
+  <div id="rrLoading" style="padding:80px 24px; text-align:center; font-size:11px; color:var(--ink-faint); letter-spacing:.12em; font-weight:300;">
+    ○ ○ ○ &nbsp; OPENING &nbsp; ○ ○ ○
   </div>
 
   <div id="rrShell" style="display:none;">
 
-    <div style="display:flex; border-bottom:1px solid var(--rule); background:var(--wood); color:#EFE9DA;">
-      <div style="padding:18px 22px; flex:1; min-width:0;">
-        <div class="rr-display" style="font-size:20px; font-weight:600; letter-spacing:.01em;">The Reading Room</div>
-        <div class="rr-mono" style="font-size:11px; opacity:.8; margin-top:2px; letter-spacing:.06em;" id="rrSubtitle">A CATALOG FOR THE DISSERTATION</div>
+    <div style="display:flex; border-bottom:1px solid var(--line); background:var(--panel2); color:var(--ink);">
+      <div style="padding:16px 20px; flex:1; min-width:0;">
+        <div style="font-size:15px; font-weight:500; letter-spacing:.06em; display:flex; align-items:center; gap:10px;">
+          READING ROOM
+          <span id="rrGlyphStrip" style="display:inline-flex; gap:3px;"></span>
+        </div>
+        <div style="font-size:9px; opacity:.55; margin-top:3px; letter-spacing:.1em; font-weight:300;">A CATALOG FOR THE DISSERTATION</div>
       </div>
       <div style="display:flex; align-items:center; gap:0;">
-        <button class="rr-mode-btn rr-mono" data-mode="reading" style="border:none; background:transparent; color:#EFE9DA; padding:0 20px; height:100%; font-size:11px; letter-spacing:.08em; cursor:pointer; border-bottom:2px solid #EFE9DA; opacity:1;">READING ROOM</button>
-        <button class="rr-mode-btn rr-mono" data-mode="writing" style="border:none; background:transparent; color:#EFE9DA; padding:0 20px; height:100%; font-size:11px; letter-spacing:.08em; cursor:pointer; border-bottom:2px solid transparent; opacity:.65;">WRITING DESK</button>
+        <button class="rr-mode-btn" data-mode="reading" style="border:none; background:transparent; color:var(--ink); padding:0 18px; height:100%; font-size:10px; letter-spacing:.1em; cursor:pointer; border-bottom:1px solid var(--glyph); opacity:1; font-weight:400;">READING ROOM</button>
+        <button class="rr-mode-btn" data-mode="writing" style="border:none; background:transparent; color:var(--ink); padding:0 18px; height:100%; font-size:10px; letter-spacing:.1em; cursor:pointer; border-bottom:1px solid transparent; opacity:.5; font-weight:400;">WRITING DESK</button>
       </div>
     </div>
 
     <div style="display:flex; min-height:420px;">
 
-      <aside style="width:168px; flex-shrink:0; background:#DCD6C6; border-right:1px solid var(--rule); padding:16px 0;">
-        <div class="rr-mono" style="font-size:10px; letter-spacing:.08em; color:var(--ink-faint); padding:0 16px 10px;">DRAWERS</div>
-        <nav id="rrTabs"></nav>
-        <div style="margin:18px 16px 0; padding-top:14px; border-top:1px solid var(--rule);">
-          <div class="rr-mono" style="font-size:10px; letter-spacing:.08em; color:var(--ink-faint); padding-bottom:8px;">TAGS</div>
-          <div id="rrTagCloud"></div>
+      <aside style="width:180px; flex-shrink:0; background:var(--panel); border-right:1px solid var(--line); padding:16px 0;">
+        <div style="font-size:9px; letter-spacing:.12em; color:var(--ink-faint); padding:0 16px 10px; display:flex; justify-content:space-between; align-items:center;">
+          <span>DRAWERS</span>
         </div>
-        <div style="margin:18px 16px 0; padding-top:14px; border-top:1px solid var(--rule);">
-          <div class="rr-mono" style="font-size:10px; letter-spacing:.06em; color:var(--ink-faint); line-height:1.7;">
-            Argument map — cards filed per pillar. A thin drawer means a thin argument.
+        <nav id="rrTabs"></nav>
+        <div id="rrDrawerAddRow" style="padding:6px 16px; margin-top:2px;">
+          <button id="rrDrawerAddBtn" type="button" style="width:100%; text-align:left; padding:6px 0; border:none; background:transparent; color:var(--ink-faint); font-size:11px; cursor:pointer; letter-spacing:.04em;">+ new drawer</button>
+        </div>
+        <div id="rrDrawerAddForm" style="display:none; padding:6px 16px; margin-bottom:6px;">
+          <input id="rrDrawerNameInput" placeholder="drawer name" style="width:100%; padding:6px 7px; font-size:11px; background:var(--bg); border:1px solid var(--line); color:var(--ink); margin-bottom:6px;" />
+          <div style="display:flex; gap:6px;">
+            <button id="rrDrawerSave" type="button" style="flex:1; padding:5px 0; font-size:10px; background:var(--ink); color:var(--bg); border:1px solid var(--ink); cursor:pointer; letter-spacing:.06em;">ADD</button>
+            <button id="rrDrawerCancel" type="button" style="flex:1; padding:5px 0; font-size:10px; background:transparent; color:var(--ink-dim); border:1px solid var(--line); cursor:pointer; letter-spacing:.06em;">CANCEL</button>
           </div>
         </div>
-        <div style="margin:18px 16px 0; padding-top:14px; border-top:1px solid var(--rule);">
-          <div class="rr-mono" style="font-size:10px; letter-spacing:.06em; color:var(--ink-faint); line-height:1.7;">
-            New sources arrive via the Literature Log in Drive. Ask Claude to "sync the reading room" to pull in the latest run.
+
+        <div style="margin:16px 16px 0; padding-top:12px; border-top:1px solid var(--line);">
+          <div style="font-size:9px; letter-spacing:.12em; color:var(--ink-faint); padding-bottom:8px;">TAGS</div>
+          <div id="rrTagCloud"></div>
+        </div>
+        <div style="margin:16px 16px 0; padding-top:12px; border-top:1px solid var(--line);">
+          <div style="font-size:9px; letter-spacing:.06em; color:var(--ink-faint); line-height:1.7;">
+            New sources sync from the Literature Log in Drive — ask Claude to pull the latest run.
           </div>
         </div>
       </aside>
 
-      <main style="flex:1; min-width:0; padding:18px 22px;">
+      <main style="flex:1; min-width:0; padding:18px 20px;">
 
-        <div id="rrReadingHead" style="display:flex; gap:10px; align-items:center; margin-bottom:16px; flex-wrap:wrap;">
+        <div id="rrReadingHead" style="display:flex; gap:8px; align-items:center; margin-bottom:16px; flex-wrap:wrap;">
           <div style="position:relative; flex:1; min-width:180px;">
-            <span class="rr-mono" style="position:absolute; left:10px; top:50%; transform:translateY(-50%); font-size:13px; color:var(--ink-faint);">⌕</span>
-            <input id="rrSearch" placeholder="search title, author, note, #tag…" class="rr-mono" style="width:100%; padding:8px 10px 8px 28px; font-size:12px; background:var(--card); border:1px solid var(--rule); color:var(--ink); outline:none;" />
+            <span style="position:absolute; left:10px; top:50%; transform:translateY(-50%); font-size:12px; color:var(--ink-faint);">○</span>
+            <input id="rrSearch" placeholder="search title, author, note, #tag…" style="width:100%; padding:8px 10px 8px 28px; font-size:11px; background:var(--panel); border:1px solid var(--line); color:var(--ink); outline:none;" />
           </div>
-          <select id="rrSort" class="rr-mono" style="padding:8px 8px; font-size:11px; background:var(--card); border:1px solid var(--rule); color:var(--ink);">
+          <select id="rrSort" style="padding:8px 8px; font-size:10px; background:var(--panel); border:1px solid var(--line); color:var(--ink);">
             <option value="dateAdded-desc">newest filed</option>
             <option value="dateAdded-asc">oldest filed</option>
             <option value="year-desc">year, newest</option>
             <option value="year-asc">year, oldest</option>
             <option value="title-asc">title, a–z</option>
           </select>
-          <button id="rrAddBtn" class="rr-mono" style="padding:8px 14px; font-size:11px; letter-spacing:.04em; background:var(--ink); color:var(--card); border:1px solid var(--ink); cursor:pointer;">+ FILE A CARD</button>
+          <button id="rrAddBtn" style="padding:8px 14px; font-size:10px; letter-spacing:.06em; background:var(--ink); color:var(--bg); border:1px solid var(--ink); cursor:pointer;">+ FILE A CARD</button>
         </div>
 
-        <div id="rrGrid" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:14px;"></div>
+        <div id="rrGrid" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:12px;"></div>
         <div id="rrEmpty" style="display:none; padding:40px 10px; text-align:center; color:var(--ink-faint);">
-          <div class="rr-display" style="font-size:16px; margin-bottom:6px;">This drawer is empty.</div>
-          <div class="rr-mono" style="font-size:11px;">File a source to begin building the argument.</div>
+          <div style="font-size:14px; margin-bottom:6px; color:var(--ink-dim); font-weight:400;">This drawer is empty.</div>
+          <div style="font-size:10px;">File a source to begin building the argument.</div>
         </div>
 
         <div id="rrWritingView" style="display:none;">
 
-          <div style="background:var(--card); border:1px solid var(--rule); margin-bottom:16px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 14px; border-bottom:1px solid var(--rule);">
-              <div class="rr-mono" style="font-size:10px; letter-spacing:.06em; color:var(--ink-faint);">WRITING DESK — DRAFTS SAVE HERE AUTOMATICALLY</div>
-              <div class="rr-mono" style="font-size:11px; display:flex; gap:14px;">
+          <div style="background:var(--panel); border:1px solid var(--line); margin-bottom:16px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 14px; border-bottom:1px solid var(--line);">
+              <div style="font-size:9px; letter-spacing:.08em; color:var(--ink-faint);">WRITING DESK — AUTOSAVES LOCALLY</div>
+              <div style="font-size:10px; display:flex; gap:14px; color:var(--ink-dim);">
                 <span id="rrDeskWords">0 words</span>
-                <span id="rrDeskSessionWords" style="color:var(--stamp-green);">+0 this session</span>
+                <span id="rrDeskSessionWords" style="color:var(--ink);">+0 this session</span>
               </div>
             </div>
-            <textarea id="rrDraft" placeholder="Start writing here — this autosaves locally as you go…" style="width:100%; min-height:220px; padding:14px; border:none; outline:none; background:transparent; font-family:'Source Serif 4',serif; font-size:15px; line-height:1.6; color:var(--ink); resize:vertical;"></textarea>
-            <div id="rrChecks" style="padding:8px 14px 12px; border-top:1px solid var(--rule); display:none;"></div>
-            <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 14px; border-top:1px solid var(--rule); flex-wrap:wrap; gap:8px;">
-              <div class="rr-mono" style="font-size:10px; color:var(--ink-faint); max-width:360px; line-height:1.5;">
-                Checks are local pattern-flags, not real grammar AI. For a real edit or argument-vetting pass, paste this draft to Claude in chat.
+            <textarea id="rrDraft" placeholder="Start writing here…" style="width:100%; min-height:220px; padding:14px; border:none; outline:none; background:transparent; font-size:13px; line-height:1.7; color:var(--ink); resize:vertical; font-weight:300;"></textarea>
+            <div id="rrChecks" style="padding:8px 14px 12px; border-top:1px solid var(--line); display:none;"></div>
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 14px; border-top:1px solid var(--line); flex-wrap:wrap; gap:8px;">
+              <div style="font-size:9px; color:var(--ink-faint); max-width:340px; line-height:1.5;">
+                Checks are local pattern-flags, not real grammar AI. For a real edit or vetting pass, paste this draft to Claude in chat.
               </div>
               <div style="display:flex; gap:8px; align-items:center;">
-                <input id="rrDeskNote" type="text" placeholder="note for this session (optional)" style="padding:7px 8px; font-size:12px; background:var(--paper); border:1px solid var(--rule); color:var(--ink); font-family:'Source Serif 4',serif; width:200px;" />
-                <button id="rrCopyDraft" type="button" class="rr-mono" style="padding:7px 12px; font-size:11px; background:transparent; border:1px solid var(--rule); color:var(--ink); cursor:pointer;">COPY DRAFT</button>
-                <button id="rrLogSession" type="button" class="rr-mono" style="padding:7px 12px; font-size:11px; background:var(--ink); color:var(--card); border:1px solid var(--ink); cursor:pointer;">LOG SESSION</button>
+                <input id="rrDeskNote" type="text" placeholder="note (optional)" style="padding:7px 8px; font-size:11px; background:var(--bg); border:1px solid var(--line); color:var(--ink); width:170px;" />
+                <button id="rrCopyDraft" type="button" style="padding:7px 12px; font-size:10px; background:transparent; border:1px solid var(--line); color:var(--ink); cursor:pointer;">COPY</button>
+                <button id="rrLogSession" type="button" style="padding:7px 12px; font-size:10px; background:var(--ink); color:var(--bg); border:1px solid var(--ink); cursor:pointer;">LOG SESSION</button>
               </div>
             </div>
           </div>
 
-          <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:18px;">
-            <div style="background:var(--card); border:1px solid var(--rule); padding:12px 14px;">
-              <div class="rr-mono" style="font-size:10px; color:var(--ink-faint); letter-spacing:.06em;">TOTAL WORDS LOGGED</div>
-              <div class="rr-display" id="rrTotalWords" style="font-size:22px; margin-top:4px;">0</div>
+          <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:16px;">
+            <div style="background:var(--panel); border:1px solid var(--line); padding:12px 14px;">
+              <div style="font-size:9px; color:var(--ink-faint); letter-spacing:.08em;">TOTAL WORDS</div>
+              <div style="font-size:20px; margin-top:4px; font-weight:300;" id="rrTotalWords">0</div>
             </div>
-            <div style="background:var(--card); border:1px solid var(--rule); padding:12px 14px;">
-              <div class="rr-mono" style="font-size:10px; color:var(--ink-faint); letter-spacing:.06em;">SESSIONS LOGGED</div>
-              <div class="rr-display" id="rrTotalSessions" style="font-size:22px; margin-top:4px;">0</div>
+            <div style="background:var(--panel); border:1px solid var(--line); padding:12px 14px;">
+              <div style="font-size:9px; color:var(--ink-faint); letter-spacing:.08em;">SESSIONS</div>
+              <div style="font-size:20px; margin-top:4px; font-weight:300;" id="rrTotalSessions">0</div>
             </div>
-            <div style="background:var(--card); border:1px solid var(--rule); padding:12px 14px;">
-              <div class="rr-mono" style="font-size:10px; color:var(--ink-faint); letter-spacing:.06em;">LAST SESSION</div>
-              <div class="rr-display" id="rrLastSession" style="font-size:22px; margin-top:4px;">—</div>
+            <div style="background:var(--panel); border:1px solid var(--line); padding:12px 14px;">
+              <div style="font-size:9px; color:var(--ink-faint); letter-spacing:.08em;">LAST SESSION</div>
+              <div style="font-size:20px; margin-top:4px; font-weight:300;" id="rrLastSession">—</div>
             </div>
           </div>
 
-          <div id="rrSessError" style="display:none; color:var(--stamp-red); font-size:11px; margin:-8px 0 14px;" class="rr-mono"></div>
+          <div id="rrSessError" style="display:none; color:var(--ink); font-size:10px; margin:-6px 0 14px; border:1px solid var(--line); padding:6px 10px; letter-spacing:.02em;"></div>
 
           <div id="rrSessList"></div>
           <div id="rrSessEmpty" style="display:none; padding:30px 10px; text-align:center; color:var(--ink-faint);">
-            <div class="rr-display" style="font-size:16px; margin-bottom:6px;">No sessions logged yet.</div>
-            <div class="rr-mono" style="font-size:11px;">Every entry becomes evidence you did the work.</div>
+            <div style="font-size:14px; margin-bottom:6px; color:var(--ink-dim);">No sessions logged yet.</div>
+            <div style="font-size:10px;">Every entry becomes evidence you did the work.</div>
           </div>
         </div>
 
@@ -127,48 +137,48 @@
     </div>
   </div>
 
-  <div id="rrModalOverlay" style="display:none; position:fixed; inset:0; background:rgba(38,34,30,.55); z-index:9999; align-items:center; justify-content:center; padding:20px;">
-    <form id="rrForm" style="background:var(--card); width:100%; max-width:420px; border:1px solid var(--rule); padding:20px 22px;">
-      <div class="rr-mono" style="font-size:10px; letter-spacing:.08em; color:var(--ink-faint); margin-bottom:10px;">NEW CATALOG CARD</div>
-      <input required id="fTitle" placeholder="title" style="width:100%; margin-bottom:8px; padding:8px; font-size:14px; background:#fff; border:1px solid var(--rule); font-family:'Fraunces',serif;" />
-      <input required id="fAuthor" placeholder="author" style="width:100%; margin-bottom:8px; padding:8px; font-size:13px; background:#fff; border:1px solid var(--rule); font-family:'Source Serif 4',serif;" />
+  <div id="rrModalOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:9999; align-items:center; justify-content:center; padding:20px;">
+    <form id="rrForm" style="background:var(--panel); width:100%; max-width:420px; border:1px solid var(--line); padding:20px 22px;">
+      <div style="font-size:9px; letter-spacing:.1em; color:var(--ink-faint); margin-bottom:10px;">NEW CATALOG CARD</div>
+      <input required id="fTitle" placeholder="title" style="width:100%; margin-bottom:8px; padding:8px; font-size:13px; background:var(--bg); border:1px solid var(--line); color:var(--ink);" />
+      <input required id="fAuthor" placeholder="author" style="width:100%; margin-bottom:8px; padding:8px; font-size:12px; background:var(--bg); border:1px solid var(--line); color:var(--ink);" />
       <div style="display:flex; gap:8px; margin-bottom:8px;">
-        <input id="fYear" placeholder="year" style="width:90px; padding:8px; font-size:13px; background:#fff; border:1px solid var(--rule);" />
-        <select id="fCategory" style="flex:1; padding:8px; font-size:13px; background:#fff; border:1px solid var(--rule);"></select>
+        <input id="fYear" placeholder="year" style="width:90px; padding:8px; font-size:12px; background:var(--bg); border:1px solid var(--line); color:var(--ink);" />
+        <select id="fCategory" style="flex:1; padding:8px; font-size:12px; background:var(--bg); border:1px solid var(--line); color:var(--ink);"></select>
       </div>
-      <input id="fUrl" placeholder="link (optional — enables the in-app reader)" style="width:100%; margin-bottom:8px; padding:8px; font-size:12px; background:#fff; border:1px solid var(--rule);" />
-      <input id="fTags" placeholder="tags, comma separated" style="width:100%; margin-bottom:8px; padding:8px; font-size:12px; background:#fff; border:1px solid var(--rule);" />
-      <textarea id="fNote" placeholder="one line — why this matters to the argument" rows="2" style="width:100%; margin-bottom:14px; padding:8px; font-size:13px; background:#fff; border:1px solid var(--rule); font-family:'Source Serif 4',serif; resize:vertical;"></textarea>
+      <input id="fUrl" placeholder="link (optional — enables in-app reader)" style="width:100%; margin-bottom:8px; padding:8px; font-size:11px; background:var(--bg); border:1px solid var(--line); color:var(--ink);" />
+      <input id="fTags" placeholder="tags, comma separated" style="width:100%; margin-bottom:8px; padding:8px; font-size:11px; background:var(--bg); border:1px solid var(--line); color:var(--ink);" />
+      <textarea id="fNote" placeholder="one line — why this matters to the argument" rows="2" style="width:100%; margin-bottom:14px; padding:8px; font-size:12px; background:var(--bg); border:1px solid var(--line); color:var(--ink); resize:vertical;"></textarea>
       <div style="display:flex; justify-content:flex-end; gap:8px;">
-        <button type="button" id="rrCancel" class="rr-mono" style="padding:8px 14px; font-size:11px; background:transparent; border:1px solid var(--rule); color:var(--ink); cursor:pointer;">CANCEL</button>
-        <button type="submit" class="rr-mono" style="padding:8px 14px; font-size:11px; background:var(--ink); color:var(--card); border:1px solid var(--ink); cursor:pointer;">FILE CARD →</button>
+        <button type="button" id="rrCancel" style="padding:8px 14px; font-size:10px; background:transparent; border:1px solid var(--line); color:var(--ink); cursor:pointer;">CANCEL</button>
+        <button type="submit" style="padding:8px 14px; font-size:10px; background:var(--ink); color:var(--bg); border:1px solid var(--ink); cursor:pointer;">FILE CARD →</button>
       </div>
     </form>
   </div>
 
-  <div id="rrReaderOverlay" style="display:none; position:fixed; inset:0; background:rgba(38,34,30,.75); z-index:9998; flex-direction:column; padding:16px;">
+  <div id="rrReaderOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.85); z-index:9998; flex-direction:column; padding:16px;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-shrink:0;">
-      <div class="rr-mono" id="rrReaderTitle" style="color:#EFE9DA; font-size:12px; letter-spacing:.04em; max-width:80%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"></div>
+      <div id="rrReaderTitle" style="color:var(--ink); font-size:11px; letter-spacing:.04em; max-width:80%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"></div>
       <div style="display:flex; gap:10px; align-items:center;">
-        <a id="rrReaderOpenTab" href="#" target="_blank" rel="noopener" class="rr-mono" style="color:#EFE9DA; font-size:11px; text-decoration:underline;">open in new tab ↗</a>
-        <button id="rrReaderClose" class="rr-mono" style="cursor:pointer; background:transparent; border:1px solid #EFE9DA; color:#EFE9DA; padding:5px 10px; font-size:11px;">CLOSE ✕</button>
+        <a id="rrReaderOpenTab" href="#" target="_blank" rel="noopener" style="color:var(--ink); font-size:10px; text-decoration:underline;">open in new tab ↗</a>
+        <button id="rrReaderClose" style="cursor:pointer; background:transparent; border:1px solid var(--line); color:var(--ink); padding:5px 10px; font-size:10px;">CLOSE ✕</button>
       </div>
     </div>
-    <div style="flex:1; background:#fff; border-radius:2px; overflow:hidden;">
+    <div style="flex:1; background:#fff; overflow:hidden;">
       <iframe id="rrReaderFrame" style="width:100%; height:100%; border:none;"></iframe>
     </div>
   </div>
 
-  <div id="rrSessReviewOverlay" style="display:none; position:fixed; inset:0; background:rgba(38,34,30,.55); z-index:9997; align-items:center; justify-content:center; padding:20px;">
-    <div style="background:var(--card); width:100%; max-width:380px; border:1px solid var(--rule); padding:20px 22px;">
-      <div class="rr-mono" style="font-size:10px; letter-spacing:.08em; color:var(--ink-faint); margin-bottom:12px;">SESSION REVIEW</div>
+  <div id="rrSessReviewOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:9997; align-items:center; justify-content:center; padding:20px;">
+    <div style="background:var(--panel); width:100%; max-width:380px; border:1px solid var(--line); padding:20px 22px;">
+      <div style="font-size:9px; letter-spacing:.1em; color:var(--ink-faint); margin-bottom:12px;">SESSION REVIEW</div>
       <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-        <div id="rrSessReviewDate" class="rr-display" style="font-size:16px;"></div>
-        <div id="rrSessReviewWords" class="rr-mono" style="font-size:13px; color:var(--stamp-green);"></div>
+        <div id="rrSessReviewDate" style="font-size:15px; font-weight:400;"></div>
+        <div id="rrSessReviewWords" style="font-size:12px; color:var(--ink-dim);"></div>
       </div>
-      <div id="rrSessReviewNote" style="font-size:13px; line-height:1.6; color:var(--ink); margin-bottom:16px;"></div>
+      <div id="rrSessReviewNote" style="font-size:12px; line-height:1.6; color:var(--ink); margin-bottom:16px;"></div>
       <div style="display:flex; justify-content:flex-end;">
-        <button id="rrSessReviewClose" type="button" class="rr-mono" style="padding:7px 14px; font-size:11px; background:var(--ink); color:var(--card); border:1px solid var(--ink); cursor:pointer;">CLOSE</button>
+        <button id="rrSessReviewClose" type="button" style="padding:7px 14px; font-size:10px; background:var(--ink); color:var(--bg); border:1px solid var(--ink); cursor:pointer;">CLOSE</button>
       </div>
     </div>
   </div>
@@ -176,29 +186,86 @@
 
 <script>
 (function(){
-  var CATEGORIES = [
-    {key:'atmospheres', label:'Atmospheres', prefix:'MNZ', accent:'#6B4A34'},
-    {key:'activism', label:'Design activism', prefix:'MRK', accent:'#8B3A2A'},
-    {key:'roii', label:'ROII / impact', prefix:'ROII', accent:'#3F5B4E'},
-    {key:'memory', label:'Contested memory', prefix:'MEM', accent:'#454F6B'},
-    {key:'unsorted', label:'Unsorted', prefix:'UNS', accent:'#8C8577'}
-  ];
   var STATUS_ORDER = ['to-read','reading','read','cited'];
   var STATUS_META = {
-    'to-read':{label:'TO READ', color:'#8C8577'},
-    'reading':{label:'READING', color:'#8B3A2A'},
-    'read':{label:'READ', color:'#26221E'},
-    'cited':{label:'CITED', color:'#3F5B4E'}
+    'to-read':{label:'TO READ', glyph:'○', filled:false, invert:false},
+    'reading':{label:'READING', glyph:'◐', filled:false, invert:false},
+    'read':{label:'READ', glyph:'◑', filled:true, invert:false},
+    'cited':{label:'CITED', glyph:'●', filled:true, invert:true}
   };
 
   var entries = [];
   var sessions = [];
+  var categories = [];
   var activeCategory = 'all';
   var activeTag = null;
   var mode = 'reading';
   var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  function catByKey(k){ for(var i=0;i<CATEGORIES.length;i++){ if(CATEGORIES[i].key===k) return CATEGORIES[i]; } return CATEGORIES[CATEGORIES.length-1]; }
+  var hasClaudeStorage = (typeof window.storage !== 'undefined' && window.storage && typeof window.storage.get === 'function');
+  function storageGet(key){
+    if(hasClaudeStorage){ return window.storage.get(key).catch(function(){ return null; }); }
+    try{ var v = window.localStorage.getItem(key); return Promise.resolve(v!==null ? {key:key, value:v} : null); }
+    catch(e){ return Promise.resolve(null); }
+  }
+  function storageSet(key, value){
+    if(hasClaudeStorage){ try{ window.storage.set(key, value); }catch(e){ console.error('storage set failed', e); } return; }
+    try{ window.localStorage.setItem(key, value); }catch(e){ console.error('storage set failed', e); }
+  }
+
+  function seedCategories(){
+    return [
+      {key:'atmospheres', label:'Atmospheres', prefix:'MNZ'},
+      {key:'activism', label:'Design activism', prefix:'MRK'},
+      {key:'roii', label:'ROII / impact', prefix:'ROII'},
+      {key:'memory', label:'Contested memory', prefix:'MEM'},
+      {key:'unsorted', label:'Unsorted', prefix:'UNS'}
+    ];
+  }
+
+  function catByKey(k){
+    for(var i=0;i<categories.length;i++){ if(categories[i].key===k) return categories[i]; }
+    for(var j=0;j<categories.length;j++){ if(categories[j].key==='unsorted') return categories[j]; }
+    return categories[0] || {key:'unsorted', label:'Unsorted', prefix:'UNS'};
+  }
+
+  function saveCategories(){ storageSet('rr-categories', JSON.stringify(categories)); }
+
+  function slugifyKey(){ return 'cat-' + Date.now() + '-' + Math.floor(Math.random()*1000); }
+
+  function prefixFromLabel(label){
+    var letters = (label.replace(/[^a-zA-Z]/g,'').toUpperCase() + 'CAT').slice(0,3);
+    var base = letters, n = 1;
+    var existing = {}; categories.forEach(function(c){ existing[c.prefix]=true; });
+    while(existing[base]){ n++; base = letters.slice(0,2) + n; }
+    return base;
+  }
+
+  function addDrawer(label){
+    label = label.trim();
+    if(!label) return;
+    categories.push({key:slugifyKey(), label:label, prefix:prefixFromLabel(label)});
+    saveCategories();
+    render();
+  }
+
+  function renameDrawer(key, newLabel){
+    newLabel = newLabel.trim();
+    if(!newLabel) return;
+    var c = categories.find(function(x){ return x.key===key; });
+    if(c){ c.label = newLabel; saveCategories(); render(); }
+  }
+
+  function deleteDrawer(key){
+    if(key==='unsorted') return;
+    var c = categories.find(function(x){ return x.key===key; });
+    if(!c) return;
+    if(!window.confirm('Delete drawer "'+c.label+'"? Its cards move to Unsorted.')) return;
+    entries.forEach(function(e){ if(e.category===key) e.category='unsorted'; });
+    categories = categories.filter(function(x){ return x.key!==key; });
+    if(activeCategory===key) activeCategory='all';
+    saveEntries(); saveCategories(); render();
+  }
 
   function seedEntries(){
     var now = Date.now();
@@ -220,17 +287,12 @@
   ];
 
   function mergeDriveImports(){
-    var existingIds = {};
-    entries.forEach(function(e){ existingIds[e.id] = true; });
-    var added = false;
-    var base = Date.now();
+    var existingIds = {}; entries.forEach(function(e){ existingIds[e.id] = true; });
+    var added = false; var base = Date.now();
     DRIVE_IMPORTS.forEach(function(imp, i){
       if(!existingIds[imp.id]){
-        var copy = {};
-        for(var k in imp){ copy[k] = imp[k]; }
-        copy.dateAdded = base + i;
-        entries.push(copy);
-        added = true;
+        var copy = {}; for(var k in imp){ copy[k] = imp[k]; }
+        copy.dateAdded = base + i; entries.push(copy); added = true;
       }
     });
     return added;
@@ -238,25 +300,57 @@
 
   function esc(s){ var d=document.createElement('div'); d.textContent = s==null?'':s; return d.innerHTML; }
 
-  function saveEntries(){ try{ window.storage.set('rr-catalog-entries', JSON.stringify(entries)); }catch(e){ console.error('save entries failed', e); } }
-  function saveSessions(){ try{ window.storage.set('rr-writing-sessions', JSON.stringify(sessions)); }catch(e){ console.error('save sessions failed', e); } }
+  function saveEntries(){ storageSet('rr-catalog-entries', JSON.stringify(entries)); }
+  function saveSessions(){ storageSet('rr-writing-sessions', JSON.stringify(sessions)); }
+
+  function renderGlyphStrip(){
+    var el = document.getElementById('rrGlyphStrip');
+    var total = entries.length;
+    var cited = entries.filter(function(e){ return e.status==='cited'; }).length;
+    var n = 8;
+    var filled = total ? Math.round((cited/total)*n) : 0;
+    var out = '';
+    for(var i=0;i<n;i++){ out += '<span style="width:4px; height:4px; border-radius:50%; background:'+(i<filled?'var(--glyph)':'var(--ink-faint)')+'; display:inline-block;"></span>'; }
+    el.innerHTML = out;
+  }
 
   function renderTabs(){
     var counts = {};
-    CATEGORIES.forEach(function(c){ counts[c.key]=0; });
+    categories.forEach(function(c){ counts[c.key]=0; });
     entries.forEach(function(e){ if(counts[e.category]!==undefined) counts[e.category]++; });
     var total = entries.length;
-    var html = '';
-    html += tabRow('all','All cards', total, '#26221E', activeCategory==='all');
-    CATEGORIES.forEach(function(c){ html += tabRow(c.key, c.label, counts[c.key], c.accent, activeCategory===c.key); });
+    var html = drawerRow('all','All cards', total, activeCategory==='all', false);
+    categories.forEach(function(c){ html += drawerRow(c.key, c.label, counts[c.key]||0, activeCategory===c.key, c.key!=='unsorted'); });
     document.getElementById('rrTabs').innerHTML = html;
     Array.prototype.forEach.call(document.querySelectorAll('.rr-tab'), function(btn){
       btn.addEventListener('click', function(){ activeCategory = btn.getAttribute('data-key'); render(); });
     });
+    Array.prototype.forEach.call(document.querySelectorAll('.rr-drawer-edit'), function(btn){
+      btn.addEventListener('click', function(ev){
+        ev.stopPropagation();
+        var key = btn.getAttribute('data-key');
+        var c = categories.find(function(x){ return x.key===key; });
+        if(!c) return;
+        var newLabel = window.prompt('Rename drawer:', c.label);
+        if(newLabel!==null) renameDrawer(key, newLabel);
+      });
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('.rr-drawer-del'), function(btn){
+      btn.addEventListener('click', function(ev){ ev.stopPropagation(); deleteDrawer(btn.getAttribute('data-key')); });
+    });
   }
-  function tabRow(key,label,count,accent,active){
-    return '<button class="rr-tab rr-mono" data-key="'+key+'" style="display:flex; justify-content:space-between; align-items:center; width:100%; text-align:left; padding:7px 16px; border:none; background:'+(active?'var(--card)':'transparent')+'; border-left:3px solid '+(active?accent:'transparent')+'; color:var(--ink); font-size:12px; cursor:pointer;">'+
-      '<span>'+esc(label)+'</span><span style="color:var(--ink-faint); font-size:10px;">'+count+'</span></button>';
+
+  function drawerRow(key,label,count,active,editable){
+    var editBtns = '';
+    if(editable){
+      editBtns = '<span class="rr-drawer-edit" data-key="'+key+'" title="rename" style="cursor:pointer; color:var(--ink-faint); padding:0 3px;">✎</span>'+
+                 '<span class="rr-drawer-del" data-key="'+key+'" title="delete" style="cursor:pointer; color:var(--ink-faint); padding:0 3px;">✕</span>';
+    }
+    return '<div style="display:flex; align-items:center; width:100%; border-left:1px solid '+(active?'var(--glyph)':'transparent')+';">'+
+      '<button class="rr-tab" data-key="'+key+'" style="flex:1; display:flex; justify-content:space-between; align-items:center; text-align:left; padding:6px 10px; border:none; background:'+(active?'var(--panel2)':'transparent')+'; color:var(--ink); font-size:11px; cursor:pointer;">'+
+      '<span>'+esc(label)+'</span><span style="color:var(--ink-faint); font-size:9px;">'+count+'</span></button>'+
+      '<span style="display:flex; padding-right:8px; font-size:10px;">'+editBtns+'</span>'+
+    '</div>';
   }
 
   function allTags(){
@@ -269,17 +363,13 @@
     var wrap = document.getElementById('rrTagCloud');
     if(!wrap) return;
     var tags = allTags();
-    if(tags.length===0){ wrap.innerHTML = '<div class="rr-mono" style="font-size:10px; color:var(--ink-faint);">no tags filed yet</div>'; return; }
+    if(tags.length===0){ wrap.innerHTML = '<div style="font-size:9px; color:var(--ink-faint);">no tags filed yet</div>'; return; }
     wrap.innerHTML = tags.map(function(t){
       var on = activeTag===t.tag;
-      return '<button class="rr-tagchip rr-mono" data-tag="'+esc(t.tag)+'" style="display:inline-flex; align-items:center; gap:4px; margin:0 6px 6px 0; padding:3px 8px; font-size:10px; letter-spacing:.02em; cursor:pointer; border:1px solid '+(on?'var(--ink)':'var(--rule)')+'; background:'+(on?'var(--ink)':'transparent')+'; color:'+(on?'var(--card)':'var(--ink)')+'; border-radius:0;">#'+esc(t.tag)+'<span style="opacity:.6;">'+t.count+'</span></button>';
+      return '<button class="rr-tagchip" data-tag="'+esc(t.tag)+'" style="display:inline-flex; align-items:center; gap:4px; margin:0 6px 6px 0; padding:3px 8px; font-size:9px; cursor:pointer; border:1px solid '+(on?'var(--glyph)':'var(--line)')+'; background:'+(on?'var(--ink)':'transparent')+'; color:'+(on?'var(--bg)':'var(--ink-dim)')+';">#'+esc(t.tag)+'<span style="opacity:.6;">'+t.count+'</span></button>';
     }).join('');
     Array.prototype.forEach.call(wrap.querySelectorAll('.rr-tagchip'), function(btn){
-      btn.addEventListener('click', function(){
-        var t = btn.getAttribute('data-tag');
-        activeTag = (activeTag===t) ? null : t;
-        render();
-      });
+      btn.addEventListener('click', function(){ var t = btn.getAttribute('data-tag'); activeTag = (activeTag===t) ? null : t; render(); });
     });
   }
 
@@ -318,21 +408,55 @@
     if(list.length===0){ grid.innerHTML=''; empty.style.display='block'; return; }
     empty.style.display='none';
     grid.innerHTML = list.map(cardHtml).join('');
-    Array.prototype.forEach.call(grid.querySelectorAll('.rr-stamp'), function(el){
-      el.addEventListener('click', function(){ cycleStatus(el.getAttribute('data-id')); });
-    });
-    Array.prototype.forEach.call(grid.querySelectorAll('.rr-cardtag'), function(el){
-      el.addEventListener('click', function(){ activeTag = el.getAttribute('data-tag'); render(); });
-    });
-    Array.prototype.forEach.call(grid.querySelectorAll('.rr-read'), function(el){
-      el.addEventListener('click', function(){ if(!el.disabled) openReader(el.getAttribute('data-id')); });
-    });
-    Array.prototype.forEach.call(grid.querySelectorAll('.rr-cite'), function(el){
-      el.addEventListener('click', function(){ citeEntry(el.getAttribute('data-id')); });
-    });
-    Array.prototype.forEach.call(grid.querySelectorAll('.rr-delete'), function(el){
-      el.addEventListener('click', function(){ deleteEntry(el.getAttribute('data-id')); });
-    });
+    Array.prototype.forEach.call(grid.querySelectorAll('.rr-stamp'), function(el){ el.addEventListener('click', function(){ cycleStatus(el.getAttribute('data-id')); }); });
+    Array.prototype.forEach.call(grid.querySelectorAll('.rr-cardtag'), function(el){ el.addEventListener('click', function(){ activeTag = el.getAttribute('data-tag'); render(); }); });
+    Array.prototype.forEach.call(grid.querySelectorAll('.rr-read'), function(el){ el.addEventListener('click', function(){ if(!el.disabled) openReader(el.getAttribute('data-id')); }); });
+    Array.prototype.forEach.call(grid.querySelectorAll('.rr-cite'), function(el){ el.addEventListener('click', function(){ citeEntry(el.getAttribute('data-id')); }); });
+    Array.prototype.forEach.call(grid.querySelectorAll('.rr-delete'), function(el){ el.addEventListener('click', function(){ deleteEntry(el.getAttribute('data-id')); }); });
+  }
+
+  function tagChips(e){
+    var tags = e.tags || [];
+    if(tags.length===0) return '';
+    return '<div style="display:flex; flex-wrap:wrap; gap:4px;">' + tags.map(function(t){
+      return '<span class="rr-cardtag" data-tag="'+esc(t)+'" style="cursor:pointer; font-size:9px; padding:2px 6px; border:1px solid var(--line); color:var(--ink-faint);">#'+esc(t)+'</span>';
+    }).join('') + '</div>';
+  }
+
+  function statusChip(status){
+    var sm = STATUS_META[status] || STATUS_META['to-read'];
+    var bg = sm.invert ? 'var(--ink)' : (sm.filled ? 'var(--line)' : 'transparent');
+    var col = sm.invert ? 'var(--bg)' : 'var(--ink)';
+    var border = sm.filled ? 'transparent' : 'var(--ink-faint)';
+    return {bg:bg, col:col, border:border, glyph:sm.glyph, label:sm.label};
+  }
+
+  function cardHtml(e){
+    var canRead = !!e.url;
+    var sc = statusChip(e.status);
+    var readBtn = '<button class="rr-read" data-id="'+e.id+'" title="'+(canRead?'read in interface':'no reader available — no link filed')+'" '+(canRead?'':'disabled')+' style="cursor:'+(canRead?'pointer':'default')+'; background:transparent; border:none; color:'+(canRead?'var(--ink-dim)':'var(--ink-faint)')+'; font-size:10px; padding:0;">'+(canRead?'read ▸':'no reader')+'</button>';
+    var citeBtn = '<button class="rr-cite" data-id="'+e.id+'" title="copy citation" style="cursor:pointer; background:transparent; border:none; color:var(--ink-faint); font-size:10px; padding:0;">cite ⧉</button>';
+    var delBtn = '<button class="rr-delete" data-id="'+e.id+'" title="remove this card" style="cursor:pointer; background:transparent; border:none; color:var(--ink-faint); font-size:11px; padding:0; line-height:1; position:absolute; top:10px; right:10px;">✕</button>';
+    return '<div style="background:var(--panel); border:1px solid var(--line); padding:12px 14px; display:flex; flex-direction:column; gap:6px; min-height:170px; position:relative;">'+
+      delBtn +
+      '<div style="font-size:9px; color:var(--ink-faint); display:flex; justify-content:space-between; padding-right:16px;"><span>'+esc(callNumber(e))+'</span><span>'+esc(e.year||'')+'</span></div>'+
+      '<div style="font-size:13px; font-weight:500; line-height:1.35; padding-right:14px; color:var(--ink);">'+esc(e.title)+'</div>'+
+      '<div style="font-size:11px; color:var(--ink-dim);">'+esc(e.author)+'</div>'+
+      (e.note ? '<div style="font-size:11px; line-height:1.55; flex:1; color:var(--ink-dim); font-weight:300;">'+esc(e.note)+'</div>' : '<div style="flex:1;"></div>') +
+      tagChips(e) +
+      '<div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:2px;">'+
+        '<div style="display:flex; gap:10px;">'+readBtn+citeBtn+'</div>'+
+        '<button class="rr-stamp" data-id="'+e.id+'" title="cycle status" style="cursor:pointer; background:'+sc.bg+'; border:1px solid '+sc.border+'; color:'+sc.col+'; padding:3px 8px; font-size:9px; letter-spacing:.04em; display:flex; align-items:center; gap:4px;">'+sc.glyph+' '+sc.label+'</button>'+
+      '</div>'+
+    '</div>';
+  }
+
+  function cycleStatus(id){
+    var e = entries.find(function(x){ return x.id===id; });
+    if(!e) return;
+    var i = STATUS_ORDER.indexOf(e.status);
+    e.status = STATUS_ORDER[(i+1) % STATUS_ORDER.length];
+    saveEntries(); renderCards(); renderTabs(); renderGlyphStrip();
   }
 
   function deleteEntry(id){
@@ -343,49 +467,6 @@
     saveEntries();
     if(activeTag && !entries.some(function(x){ return (x.tags||[]).indexOf(activeTag)!==-1; })) activeTag = null;
     render();
-  }
-
-  function tagChips(e){
-    var tags = e.tags || [];
-    if(tags.length===0) return '';
-    return '<div style="display:flex; flex-wrap:wrap; gap:4px;">' + tags.map(function(t){
-      return '<span class="rr-cardtag rr-mono" data-tag="'+esc(t)+'" style="cursor:pointer; font-size:9px; padding:2px 6px; border:1px solid var(--rule); color:var(--ink-faint);">#'+esc(t)+'</span>';
-    }).join('') + '</div>';
-  }
-
-  function cardHtml(e){
-    var cat = catByKey(e.category);
-    var sm = STATUS_META[e.status] || STATUS_META['to-read'];
-    var canRead = !!e.url;
-    var readBtn = '<button class="rr-read rr-mono" data-id="'+e.id+'" title="'+(canRead?'read in interface':'no reader available — no link filed')+'" '+(canRead?'':'disabled')+' style="cursor:'+(canRead?'pointer':'default')+'; background:transparent; border:none; color:'+(canRead?'var(--stamp-indigo)':'var(--rule)')+'; font-size:10px; padding:0; letter-spacing:.02em;" class="rr-mono">'+(canRead?'read ▸':'no reader')+'</button>';
-    var citeBtn = '<button class="rr-cite rr-mono" data-id="'+e.id+'" title="copy citation" style="cursor:pointer; background:transparent; border:none; color:var(--ink-faint); font-size:10px; padding:0; letter-spacing:.02em;">cite ⧉</button>';
-    var delBtn = '<button class="rr-delete rr-mono" data-id="'+e.id+'" title="remove this card" style="cursor:pointer; background:transparent; border:none; color:var(--ink-faint); font-size:12px; padding:0; line-height:1;">✕</button>';
-    return '<div style="background:var(--card); border:1px solid var(--rule); border-left:3px solid '+cat.accent+'; padding:12px 14px; display:flex; flex-direction:column; gap:6px; min-height:170px; position:relative;">'+
-      delBtn.replace('style="', 'style="position:absolute; top:10px; right:10px; ') +
-      '<div class="rr-mono" style="font-size:10px; color:var(--ink-faint); display:flex; justify-content:space-between; padding-right:16px;"><span>'+esc(callNumber(e))+'</span><span>'+esc(e.year||'')+'</span></div>'+
-      '<div class="rr-display" style="font-size:14px; font-weight:600; line-height:1.3; padding-right:14px;">'+esc(e.title)+'</div>'+
-      '<div style="font-size:12px; color:var(--ink-faint); font-style:italic;">'+esc(e.author)+'</div>'+
-      (e.note ? '<div style="font-size:12px; line-height:1.5; flex:1;">'+esc(e.note)+'</div>' : '<div style="flex:1;"></div>') +
-      tagChips(e) +
-      '<div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:2px;">'+
-        '<div style="display:flex; gap:10px;">'+readBtn+citeBtn+'</div>'+
-        '<button class="rr-stamp rr-mono" data-id="'+e.id+'" title="cycle status" style="cursor:pointer; background:transparent; border:1.5px solid '+sm.color+'; color:'+sm.color+'; padding:3px 8px; font-size:9px; letter-spacing:.06em; transform:rotate(-2deg); transition:'+(reduceMotion?'none':'transform .15s')+';">'+sm.label+'</button>'+
-      '</div>'+
-    '</div>';
-  }
-
-  function cycleStatus(id){
-    var e = entries.find(function(x){ return x.id===id; });
-    if(!e) return;
-    var i = STATUS_ORDER.indexOf(e.status);
-    e.status = STATUS_ORDER[(i+1) % STATUS_ORDER.length];
-    saveEntries();
-    renderCards();
-    if(!reduceMotion){
-      var btn = document.querySelector('.rr-stamp[data-id="'+id+'"]');
-      if(btn){ btn.style.transform='rotate(-2deg) scale(1.25)'; setTimeout(function(){ btn.style.transform='rotate(-2deg) scale(1)'; },150); }
-    }
-    renderTabs();
   }
 
   function renderWriting(){
@@ -400,16 +481,14 @@
     if(list.length===0){ wrap.innerHTML=''; empty.style.display='block'; return; }
     empty.style.display='none';
     wrap.innerHTML = list.map(function(s){
-      return '<div class="rr-sessrow" data-id="'+s.id+'" style="display:flex; gap:14px; padding:10px 0; border-bottom:1px solid var(--rule); align-items:baseline; cursor:pointer;">'+
-        '<div class="rr-mono" style="font-size:11px; color:var(--ink-faint); width:90px; flex-shrink:0;">'+esc(s.date)+'</div>'+
-        '<div class="rr-display" style="font-size:14px; width:80px; flex-shrink:0;">'+(parseInt(s.words)||0).toLocaleString()+' w</div>'+
-        '<div style="font-size:13px; color:var(--ink); flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">'+esc(s.note||'')+'</div>'+
-        '<div class="rr-mono" style="font-size:10px; color:var(--stamp-indigo); flex-shrink:0;">review ▸</div>'+
+      return '<div class="rr-sessrow" data-id="'+s.id+'" style="display:flex; gap:14px; padding:10px 0; border-bottom:1px solid var(--line); align-items:baseline; cursor:pointer;">'+
+        '<div style="font-size:10px; color:var(--ink-faint); width:90px; flex-shrink:0;">'+esc(s.date)+'</div>'+
+        '<div style="font-size:13px; width:70px; flex-shrink:0; color:var(--ink);">'+(parseInt(s.words)||0).toLocaleString()+' w</div>'+
+        '<div style="font-size:12px; color:var(--ink-dim); flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:300;">'+esc(s.note||'')+'</div>'+
+        '<div style="font-size:9px; color:var(--ink-faint); flex-shrink:0;">review ▸</div>'+
       '</div>';
     }).join('');
-    Array.prototype.forEach.call(wrap.querySelectorAll('.rr-sessrow'), function(el){
-      el.addEventListener('click', function(){ openSessionReview(el.getAttribute('data-id')); });
-    });
+    Array.prototype.forEach.call(wrap.querySelectorAll('.rr-sessrow'), function(el){ el.addEventListener('click', function(){ openSessionReview(el.getAttribute('data-id')); }); });
   }
 
   function openSessionReview(id){
@@ -425,6 +504,7 @@
   function render(){
     renderTabs();
     renderTagCloud();
+    renderGlyphStrip();
     if(mode==='reading'){
       document.getElementById('rrReadingHead').style.display='flex';
       document.getElementById('rrGrid').style.display='grid';
@@ -441,10 +521,9 @@
 
   function openModal(){
     var sel = document.getElementById('fCategory');
-    sel.innerHTML = CATEGORIES.map(function(c){ return '<option value="'+c.key+'">'+esc(c.label)+'</option>'; }).join('');
-    if(activeCategory!=='all') sel.value = activeCategory;
+    sel.innerHTML = categories.map(function(c){ return '<option value="'+c.key+'">'+esc(c.label)+'</option>'; }).join('');
     document.getElementById('rrForm').reset();
-    sel.value = activeCategory!=='all' ? activeCategory : 'unsorted';
+    sel.value = (activeCategory!=='all' && categories.some(function(c){return c.key===activeCategory;})) ? activeCategory : 'unsorted';
     document.getElementById('rrModalOverlay').style.display='flex';
     document.getElementById('fTitle').focus();
   }
@@ -465,35 +544,25 @@
     document.getElementById('rrReaderOverlay').style.display = 'flex';
     if(e.status==='to-read'){ e.status='reading'; saveEntries(); renderCards(); }
   }
-  function closeReader(){
-    document.getElementById('rrReaderOverlay').style.display = 'none';
-    document.getElementById('rrReaderFrame').src = '';
-  }
+  function closeReader(){ document.getElementById('rrReaderOverlay').style.display = 'none'; document.getElementById('rrReaderFrame').src = ''; }
 
   function citeEntry(id){
     var e = entries.find(function(x){ return x.id===id; });
     if(!e) return;
     var y = e.year ? ' ('+e.year+')' : '';
     var text = e.author + y + '. ' + e.title + '.' + (e.url ? ' ' + e.url : '');
-    var done = function(){
-      var btn = document.querySelector('.rr-cite[data-id="'+id+'"]');
-      if(btn){ var orig = btn.textContent; btn.textContent = 'copied ✓'; setTimeout(function(){ btn.textContent = orig; }, 1200); }
-    };
-    if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(text).then(done).catch(function(){ window.prompt('Copy citation:', text); });
-    } else {
-      window.prompt('Copy citation:', text);
-    }
+    var done = function(){ var btn = document.querySelector('.rr-cite[data-id="'+id+'"]'); if(btn){ var orig = btn.textContent; btn.textContent = 'copied ✓'; setTimeout(function(){ btn.textContent = orig; }, 1200); } };
+    if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).then(done).catch(function(){ window.prompt('Copy citation:', text); }); }
+    else { window.prompt('Copy citation:', text); }
   }
 
   function init(){
-    document.getElementById('rrSubtitle').textContent = 'A CATALOG FOR THE DISSERTATION';
     Array.prototype.forEach.call(document.querySelectorAll('.rr-mode-btn'), function(btn){
       btn.addEventListener('click', function(){
         mode = btn.getAttribute('data-mode');
         Array.prototype.forEach.call(document.querySelectorAll('.rr-mode-btn'), function(b){
-          b.style.opacity = b===btn ? '1' : '.65';
-          b.style.borderBottomColor = b===btn ? '#EFE9DA' : 'transparent';
+          b.style.opacity = b===btn ? '1' : '.5';
+          b.style.borderBottomColor = b===btn ? 'var(--glyph)' : 'transparent';
         });
         render();
       });
@@ -507,6 +576,27 @@
     document.getElementById('rrReaderOverlay').addEventListener('click', function(ev){ if(ev.target.id==='rrReaderOverlay') closeReader(); });
     document.getElementById('rrSessReviewClose').addEventListener('click', closeSessionReview);
     document.getElementById('rrSessReviewOverlay').addEventListener('click', function(ev){ if(ev.target.id==='rrSessReviewOverlay') closeSessionReview(); });
+
+    document.getElementById('rrDrawerAddBtn').addEventListener('click', function(){
+      document.getElementById('rrDrawerAddRow').style.display='none';
+      document.getElementById('rrDrawerAddForm').style.display='block';
+      document.getElementById('rrDrawerNameInput').focus();
+    });
+    document.getElementById('rrDrawerCancel').addEventListener('click', function(){
+      document.getElementById('rrDrawerAddForm').style.display='none';
+      document.getElementById('rrDrawerAddRow').style.display='block';
+      document.getElementById('rrDrawerNameInput').value='';
+    });
+    document.getElementById('rrDrawerSave').addEventListener('click', function(){
+      var v = document.getElementById('rrDrawerNameInput').value;
+      addDrawer(v);
+      document.getElementById('rrDrawerNameInput').value='';
+      document.getElementById('rrDrawerAddForm').style.display='none';
+      document.getElementById('rrDrawerAddRow').style.display='block';
+    });
+    document.getElementById('rrDrawerNameInput').addEventListener('keydown', function(ev){
+      if(ev.key==='Enter'){ ev.preventDefault(); document.getElementById('rrDrawerSave').click(); }
+    });
 
     document.getElementById('rrForm').addEventListener('submit', function(ev){
       ev.preventDefault();
@@ -532,19 +622,12 @@
     var sessionBaseline = 0;
     var checkTimer = null;
 
-    function wordCount(text){
-      var t = text.trim();
-      if(!t) return 0;
-      return t.split(/\s+/).length;
-    }
+    function wordCount(text){ var t = text.trim(); if(!t) return 0; return t.split(/\s+/).length; }
 
     function runChecks(text){
       var flags = [];
       var sentences = text.split(/(?<=[.!?])\s+/).filter(Boolean);
-      sentences.forEach(function(s){
-        var wc = wordCount(s);
-        if(wc > 40) flags.push('A sentence runs ' + wc + ' words — consider splitting it.');
-      });
+      sentences.forEach(function(s){ var wc = wordCount(s); if(wc > 40) flags.push('A sentence runs ' + wc + ' words — consider splitting it.'); });
       var passivePattern = /\b(is|are|was|were|be|been|being)\s+\w+ed\b/gi;
       var passiveMatches = text.match(passivePattern);
       if(passiveMatches && passiveMatches.length >= 3) flags.push(passiveMatches.length + ' possible passive-voice constructions — worth a scan.');
@@ -560,8 +643,8 @@
       var flags = text.trim() ? runChecks(text) : [];
       if(flags.length===0){ box.style.display='none'; box.innerHTML=''; return; }
       box.style.display='block';
-      box.innerHTML = '<div class="rr-mono" style="font-size:10px; color:var(--ink-faint); letter-spacing:.06em; margin-bottom:6px;">FLAGGED</div>' +
-        flags.map(function(f){ return '<div style="font-size:12px; color:var(--stamp-red); margin-bottom:3px;">· '+esc(f)+'</div>'; }).join('');
+      box.innerHTML = '<div style="font-size:9px; color:var(--ink-faint); letter-spacing:.08em; margin-bottom:6px;">FLAGGED</div>' +
+        flags.map(function(f){ return '<div style="font-size:11px; color:var(--ink-dim); margin-bottom:3px;">· '+esc(f)+'</div>'; }).join('');
     }
 
     function updateDeskStats(){
@@ -574,7 +657,7 @@
 
     draftEl.addEventListener('input', function(){
       updateDeskStats();
-      try{ window.storage.set('rr-draft-text', draftEl.value); }catch(e){ console.error('draft save failed', e); }
+      try{ storageSet('rr-draft-text', draftEl.value); }catch(e){ console.error('draft save failed', e); }
       clearTimeout(checkTimer);
       checkTimer = setTimeout(function(){ renderChecks(draftEl.value); }, 500);
     });
@@ -582,7 +665,7 @@
     document.getElementById('rrCopyDraft').addEventListener('click', function(){
       var text = draftEl.value;
       var btn = document.getElementById('rrCopyDraft');
-      var done = function(){ var orig = btn.textContent; btn.textContent='COPIED ✓'; setTimeout(function(){ btn.textContent = orig; }, 1200); };
+      var done = function(){ var orig = btn.textContent; btn.textContent='COPIED'; setTimeout(function(){ btn.textContent = orig; }, 1200); };
       if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text).then(done).catch(function(){ window.prompt('Copy draft:', text); }); }
       else { window.prompt('Copy draft:', text); }
     });
@@ -604,26 +687,26 @@
     });
 
     Promise.all([
-      window.storage.get('rr-catalog-entries').catch(function(){ return null; }),
-      window.storage.get('rr-writing-sessions').catch(function(){ return null; }),
-      window.storage.get('rr-draft-text').catch(function(){ return null; })
+      storageGet('rr-catalog-entries'),
+      storageGet('rr-writing-sessions'),
+      storageGet('rr-draft-text'),
+      storageGet('rr-categories')
     ]).then(function(results){
-      try{
-        entries = results[0] && results[0].value ? JSON.parse(results[0].value) : seedEntries();
-      }catch(e){ entries = seedEntries(); }
-      try{
-        sessions = results[1] && results[1].value ? JSON.parse(results[1].value) : [];
-      }catch(e){ sessions = []; }
+      try{ categories = results[3] && results[3].value ? JSON.parse(results[3].value) : seedCategories(); }catch(e){ categories = seedCategories(); }
+      try{ entries = results[0] && results[0].value ? JSON.parse(results[0].value) : seedEntries(); }catch(e){ entries = seedEntries(); }
+      try{ sessions = results[1] && results[1].value ? JSON.parse(results[1].value) : []; }catch(e){ sessions = []; }
       draftEl.value = (results[2] && results[2].value) ? results[2].value : '';
       sessionBaseline = wordCount(draftEl.value);
       updateDeskStats();
       var importedNew = mergeDriveImports();
       if(!results[0] || importedNew) saveEntries();
+      if(!results[3]) saveCategories();
       document.getElementById('rrLoading').style.display='none';
       document.getElementById('rrShell').style.display='block';
       render();
     }).catch(function(err){
       console.error('storage load failed', err);
+      categories = seedCategories();
       entries = seedEntries();
       sessions = [];
       document.getElementById('rrLoading').style.display='none';
